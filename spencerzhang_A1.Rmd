@@ -14,7 +14,6 @@ library(tidyverse)
 library(plotly)
 ```
 
-### Read PGE electricity original data
 ```{r include = F}
 
 years <- 2017:2021
@@ -48,7 +47,6 @@ for(year in years) {
 saveRDS(pge_elec, "pge_elec.rds")
 ```
 
-### Read PGE gas original data
 ```{r include = F}
 years <- 2017:2021
 pge_gas <- NULL
@@ -83,7 +81,6 @@ saveRDS(pge_gas, "pge_gas.rds")
 ```{r}
 ```
 
-### Organize data
 ```{r include = F}
 pge_elec_final <-
   pge_elec %>% 
@@ -117,6 +114,7 @@ pge_elec_final <-
 
 pge_elec_final$DATE <- paste(pge_elec_final$YEAR,"-", pge_elec_final$MONTH)
 
+pge_elec_final$BTU <- pge_elec_final$TOTALKWH * 3412
 ```
 
 ```{r include = F}
@@ -150,19 +148,22 @@ pge_gas_final <-
       TOTALTHM/TOTALCUSTOMERS
   )
 pge_gas_final$DATE <- paste(pge_gas_final$YEAR,"-", pge_gas_final$MONTH)
+pge_gas_final$BTU <- pge_gas_final$TOTALTHM * 99976
 ```
 
 
-## Plot
-
 ```{r include = F}
-pge_elec_chart <-
-  pge_elec_final %>% 
+pge_final <- full_join(pge_elec_final, pge_gas_final)
+comer <- filter(pge_final, CUSTOMERCLASS %in% c("Gas- Commercial", "Elec- Commercial"))
+comer <- select(comer, c("DATE", "CUSTOMERCLASS","BTU"))
+
+pge_c_chart <-
+  comer %>% 
   ggplot() +
   geom_bar(
     aes(
       x = DATE,
-      y = TOTALKWH,
+      y = BTU,
       fill = CUSTOMERCLASS
     ),
     stat = "identity",
@@ -170,24 +171,28 @@ pge_elec_chart <-
   ) +
   labs(
     x = "Y-M",
-    y = "kWh",
-    title = "PG&E Territory Monthly Electricity Usage, 2019",
-    fill = "Electricity Type"
+    y = "BTU",
+    title = "PG&E Territory Commercial Monthly Electricity/Gas Usage, 2019",
+    fill = "Energy Type"
   )
 ```
 
 ```{r}
-pge_elec_chart
+pge_c_chart
 ```
 
 ```{r include = F}
-pge_gas_chart <-
-  pge_gas_final %>% 
+pge_final <- full_join(pge_elec_final, pge_gas_final)
+res <- filter(pge_final, CUSTOMERCLASS %in% c("Gas- Residential", "Elec- Residential"))
+comer <- select(comer, c("DATE", "CUSTOMERCLASS","BTU"))
+
+pge_r_chart <-
+  res %>% 
   ggplot() +
   geom_bar(
     aes(
       x = DATE,
-      y = TOTALTHM,
+      y = BTU,
       fill = CUSTOMERCLASS
     ),
     stat = "identity",
@@ -195,13 +200,14 @@ pge_gas_chart <-
   ) +
   labs(
     x = "Y-M",
-    y = "THM",
-    title = "PG&E Territory Monthly Gas Usage, 2019",
-    fill = "Gas Type"
+    y = "BTU",
+    title = "PG&E Territory Residential Monthly Electricity/Gas Usage, 2019",
+    fill = "Energy Type"
   )
+
 ```
 
 ```{r}
-pge_gas_chart
+pge_r_chart
 ```
 

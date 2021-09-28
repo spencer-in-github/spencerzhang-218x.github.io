@@ -1,0 +1,207 @@
+---
+title: "spencerzhang_A1"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include = F}
+library(tidyverse)
+library(plotly)
+```
+
+### Read PGE electricity original data
+```{r include = F}
+
+years <- 2017:2021
+pge_elec <- NULL
+for(year in years) {
+  quarters <- 1:4
+  type <- "Electric"
+  
+  for(quarter in quarters) {
+    if(year == 2021 & quarter == 3) break
+    filename <- 
+      paste0(
+        "pge/PGE_",
+        year,
+        "_Q",
+        quarter,
+        "_",
+        type,
+        "UsageByZip.csv"
+      )
+  
+    print(filename)
+    
+    temp <- read_csv(filename)
+    
+    pge_elec <- rbind(pge_elec,temp)
+    # Note rbind requires field names to be consistent for every new thing that you add.
+  }
+
+}
+saveRDS(pge_elec, "pge_elec.rds")
+```
+
+### Read PGE gas original data
+```{r include = F}
+years <- 2017:2021
+pge_gas <- NULL
+for(year in years) {
+  quarters <- 1:4
+  type <- "Gas"
+  
+  for(quarter in quarters) {
+    if(year == 2021 & quarter == 3) break
+    filename <- 
+      paste0(
+        "pge/PGE_",
+        year,
+        "_Q",
+        quarter,
+        "_",
+        type,
+        "UsageByZip.csv"
+      )
+  
+    print(filename)
+    
+    temp <- read_csv(filename)
+    
+    pge_gas <- rbind(pge_gas,temp)
+    # Note rbind requires field names to be consistent for every new thing that you add.
+  }
+
+}
+saveRDS(pge_gas, "pge_gas.rds")
+```
+```{r}
+```
+
+### Organize data
+```{r include = F}
+pge_elec_final <-
+  pge_elec %>% 
+  filter(
+    CUSTOMERCLASS %in% 
+      c(
+        "Elec- Residential",
+        "Elec- Commercial"
+      )
+  ) %>% 
+  select(
+    -c(COMBINED, AVERAGEKWH)
+  ) %>%  
+  group_by(MONTH, YEAR, CUSTOMERCLASS) %>% 
+  summarize(
+    TOTALKWH = 
+      sum(
+        TOTALKWH, 
+        na.rm = T
+      ),
+    TOTALCUSTOMERS =
+      sum(
+        TOTALCUSTOMERS,
+        na.rm = T
+      )
+  ) %>% 
+  mutate(
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+
+pge_elec_final$DATE <- paste(pge_elec_final$YEAR,"-", pge_elec_final$MONTH)
+
+```
+
+```{r include = F}
+pge_gas_final <-
+  pge_gas %>% 
+  filter(
+    CUSTOMERCLASS %in% 
+      c(
+        "Gas- Residential",
+        "Gas- Commercial"
+      )
+  ) %>% 
+  select(
+    -c(COMBINED, AVERAGETHM)
+  ) %>% 
+  group_by(MONTH, YEAR, CUSTOMERCLASS) %>% 
+  summarize(
+    TOTALTHM = 
+      sum(
+        TOTALTHM, 
+        na.rm = T
+      ),
+    TOTALCUSTOMERS =
+      sum(
+        TOTALCUSTOMERS,
+        na.rm = T
+      )
+  ) %>% 
+  mutate(
+    AVERAGETHM =
+      TOTALTHM/TOTALCUSTOMERS
+  )
+pge_gas_final$DATE <- paste(pge_gas_final$YEAR,"-", pge_gas_final$MONTH)
+```
+
+
+## Plot
+
+```{r include = F}
+pge_elec_chart <-
+  pge_elec_final %>% 
+  ggplot() +
+  geom_bar(
+    aes(
+      x = DATE,
+      y = TOTALKWH,
+      fill = CUSTOMERCLASS
+    ),
+    stat = "identity",
+    position = "stack"
+  ) +
+  labs(
+    x = "Y-M",
+    y = "kWh",
+    title = "PG&E Territory Monthly Electricity Usage, 2019",
+    fill = "Electricity Type"
+  )
+```
+
+```{r}
+pge_elec_chart
+```
+
+```{r include = F}
+pge_gas_chart <-
+  pge_gas_final %>% 
+  ggplot() +
+  geom_bar(
+    aes(
+      x = DATE,
+      y = TOTALTHM,
+      fill = CUSTOMERCLASS
+    ),
+    stat = "identity",
+    position = "stack"
+  ) +
+  labs(
+    x = "Y-M",
+    y = "THM",
+    title = "PG&E Territory Monthly Gas Usage, 2019",
+    fill = "Gas Type"
+  )
+```
+
+```{r}
+pge_gas_chart
+```
+

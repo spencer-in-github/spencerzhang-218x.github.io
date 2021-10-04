@@ -1,0 +1,428 @@
+---
+title: "spencerzhang_A2"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(sf)
+library(tigris)
+library(leaflet)
+library(censusapi)
+library(mapview)
+
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r}
+library(devtools)
+install_github('walkerke/tigris')
+library(tigris)
+```
+
+```{r}
+dec_vars_2020 <-
+  listCensusMetadata(
+    name = "2020/dec/pl",
+    type = "variables"
+  )
+
+dec_vars_2010 <-
+  listCensusMetadata(
+    name = "2010/dec/pl",
+    type = "variables"
+  )
+```
+
+2020 data download
+```{r}
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+
+smc_pop_2020 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2020,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "P1_001N"
+  ) %>% 
+  transmute(
+    block =
+      paste0(state,county,tract,block),
+    pop = P1_001N
+  )
+```
+
+2010 data download
+```{r}
+smc_pop_2010 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2010,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "P001001"
+  ) %>% 
+  transmute(
+    block =
+      paste0(state,county,tract,block),
+    pop = P001001
+  )
+```
+
+
+```{r}
+smc_pop_race_2020 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2020,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "group(P1)"
+  ) %>% 
+  mutate(
+    block =
+      paste0(state,county,tract,block)
+  ) %>% 
+  select(!c(GEO_ID,state,county,tract,NAME) & !ends_with(c("NA"))) %>% 
+  pivot_longer(
+    ends_with("N"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    dec_vars_2020 %>% 
+      select(name, label)
+  ) %>% 
+  select(-name) %>% 
+  separate(
+    label,
+    into = c(NA,NA,"category1","category2"),
+    sep = "!!"
+  )
+```
+
+```{r}
+smc_pop_race_2010 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2010,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "group(P1)"
+  ) %>% 
+  mutate(
+    block =
+      paste0(state,county,tract,block)
+  ) %>% 
+  select(!c(GEO_ID,state,county,tract,NAME) & !ends_with(c("NA"))) %>% 
+  pivot_longer(
+    starts_with("P"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    dec_vars_2010 %>% 
+      select(name, label)
+  ) %>% 
+  select(-name) %>% 
+  separate(
+    label,
+    into = c(NA,NA,"category1","category2"),
+    sep = "!!"
+  )
+```
+
+```{r}
+dec_vars_2020 %>% 
+  filter(grepl("P1",name)) %>% 
+  select(name, label) %>% 
+  arrange(name)
+```
+
+```{r}
+dec_vars_2010 %>% 
+  filter(grepl("P",name)) %>% 
+  select(name, label) %>% 
+  arrange(name)
+```
+
+
+# get block info/sf object
+```{r}
+smc_blocks_2020 <- blocks("CA", "San Mateo", year = 2020, progress_bar = F)
+
+nfo_boundary <- places("CA", progress_bar = F) %>% 
+  filter(NAME == "North Fair Oaks")
+
+#sf object
+nfo_pop_2020 <- smc_pop_2020 %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>% 
+  .[nfo_boundary, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf()
+```
+
+## get area&density info from sf object
+```{r}
+smc_pop_2020$area <- as.data.frame(nfo_pop_2020)
+```
+
+
+```{r}
+smc_blocks_2010 <- blocks("CA", "San Mateo", year = 2010, progress_bar = F)
+
+nfo_boundary <- places("CA", progress_bar = F) %>% 
+  filter(NAME == "North Fair Oaks")
+
+#sf object
+nfo_pop_2010 <- smc_pop_2010 %>% 
+  left_join(smc_blocks_2010 %>% select(block = GEOID10)) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>% 
+  .[nfo_boundary, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(smc_blocks_2010 %>% select(block = GEOID10)) %>% 
+  st_as_sf()
+```
+
+```{r}
+mapview(nfo_pop_2020, zcol = "pop")
+```
+
+```{r}
+mapview(nfo_pop_2010, zcol = "pop")
+```
+
+
+
+# get 2010-2020 pop data #todo
+dont need this yet;
+do spatial subsetting first
+```{r}
+smc_pop <- left_join(smc_pop_2020, smc_pop_2010, by = "block")
+
+smc_pop$increase <- smc_pop$pop.x - smc_pop$pop.y
+smc_pop$percentage <- case_when( 
+  smc_pop$pop.y == 0 & !smc_pop$pop.x == 0 ~100,
+  smc_pop$pop.y == 0 & smc_pop$pop.x == 0 ~0,
+  TRUE ~ smc_pop$increase/smc_pop$pop.y
+  ) 
+```
+
+```{r}
+smc_blocks_2020 <- blocks("CA", "San Mateo", year = 2020, progress_bar = F)
+
+nfo_boundary <- places("CA", progress_bar = F) %>% 
+  filter(NAME == "North Fair Oaks")
+
+nfo_pop <- smc_pop %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>% 
+  .[nfo_boundary, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf()
+```
+
+```{r}
+mapview(nfo_pop, zcol = "increase")
+```
+
+```{r}
+mapview(nfo_pop, zcol = "percentage")
+```
+
+
+# area calculation
+```{r}
+library(tigris)
+library(sf)
+library(leaflet)
+library(tidyverse)
+
+bay_pdas <- st_read("https://opendata.arcgis.com/datasets/4df9cb38d77346a289252ced4ffa0ca0_0.geojson")
+
+smc_pdas <-
+  bay_pdas %>% 
+  filter(county == "San Mateo") %>% 
+  st_transform(4269)
+
+smc_pdas_blocks <- smc_blocks_2020[smc_pdas, ]
+```
+
+```{r}
+smc_pdas_blocks_area <-
+  smc_pdas_blocks %>% 
+  st_transform(26910) %>% 
+  mutate(area = st_area(.))
+```
+
+```{r}
+smc_pdas_blocks_intersection <-
+  smc_pdas_blocks_area %>% 
+  st_intersection(
+    smc_pdas %>% 
+      st_transform(26910)
+  )
+```
+
+```{r}
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(
+    data = smc_pdas,
+    stroke = F,
+    fillOpacity = 0.5
+  ) %>% 
+  addPolygons(
+    data = smc_pdas_blocks_intersection %>% 
+      st_transform(4269),
+    color = "red",
+    weight = 0.75,
+    fill = F
+  )
+```
+
+```{r}
+smc_pdas_blocks_3 <-
+  smc_pdas_blocks %>% 
+  select(block = GEOID20) %>% 
+  left_join(smc_pop_2020) %>% 
+  st_transform(26910) %>% 
+  mutate(original_area = st_area(.)) %>% 
+  st_intersection(
+    smc_pdas %>% 
+      st_transform(26910)
+  ) %>% 
+  mutate(
+    leftover_area = st_area(.),
+    perc_area = leftover_area / original_area,
+    pop = pop * perc_area
+  )
+```
+
+
+
+
+
+# join in area #todo
+```{r}
+smc_pop <- left_join(smc_pop_2020, smc_pop_2010, by = "block")
+
+smc_pop$increase <- smc_pop$pop.x - smc_pop$pop.y
+smc_pop$percentage <- case_when( 
+  smc_pop$pop.y == 0 & !smc_pop$pop.x == 0 ~100,
+  smc_pop$pop.y == 0 & smc_pop$pop.x == 0 ~0,
+  TRUE ~ smc_pop$increase/smc_pop$pop.y
+  ) 
+```
+
+# plot #todo
+```{r}
+smc_blocks_2020 <- blocks("CA", "San Mateo", year = 2020, progress_bar = F)
+
+nfo_boundary <- places("CA", progress_bar = F) %>% 
+  filter(NAME == "North Fair Oaks")
+
+nfo_pop <- smc_pop %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf() %>% 
+  st_centroid() %>% 
+  .[nfo_boundary, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(smc_blocks_2020 %>% select(block = GEOID20)) %>% 
+  st_as_sf()
+```
+
+```{r}
+mapview(nfo_pop, zcol = "increase")
+```
+
+```{r}
+mapview(nfo_pop, zcol = "percentage")
+```
+
+
+# spatial subset example code
+```{r}
+library(tigris)
+library(sf)
+library(leaflet)
+library(tidyverse)
+
+bay_pdas <- st_read("https://opendata.arcgis.com/datasets/4df9cb38d77346a289252ced4ffa0ca0_0.geojson")
+
+smc_pdas <-
+  bay_pdas %>% 
+  filter(county == "San Mateo") %>% 
+  st_transform(4269)
+
+smc_pdas_blocks <- smc_blocks_2020[smc_pdas, ]
+```
+
+```{r}
+smc_pdas_blocks_1 <- smc_pdas_blocks %>% 
+  select(block = GEOID20) %>% 
+  left_join(smc_pop_2020)
+
+sum(smc_pdas_blocks_1$pop)
+```
+
+```{r}
+smc_pdas_blocks_2 <-
+  smc_pdas_blocks_1 %>% 
+  st_centroid() %>% 
+  .[smc_pdas, ] %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(smc_pdas_blocks_1 %>% select(block)) %>% 
+  st_as_sf()
+
+sum(smc_pdas_blocks_2$pop)
+```
+
+```{r}
+smc_pdas_blocks_area <-
+  smc_pdas_blocks %>% 
+  st_transform(26910) %>% 
+  mutate(area = st_area(.))
+```
+
+```{r}
+smc_pdas_blocks_intersection <-
+  smc_pdas_blocks_area %>% 
+  st_intersection(
+    smc_pdas %>% 
+      st_transform(26910)
+  )
+```
+
+```{r}
+smc_pdas_blocks_3 <-
+  smc_pdas_blocks %>% 
+  select(block = GEOID20) %>% 
+  left_join(smc_pop_2020) %>% 
+  st_transform(26910) %>% 
+  mutate(original_area = st_area(.)) %>% 
+  st_intersection(
+    smc_pdas %>% 
+      st_transform(26910)
+  ) %>% 
+  mutate(
+    leftover_area = st_area(.),
+    perc_area = leftover_area / original_area,
+    pop = pop * perc_area
+  )
+```
+

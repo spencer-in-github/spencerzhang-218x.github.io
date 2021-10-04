@@ -1,0 +1,80 @@
+---
+title: "218x-w2"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+ˆ
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris) #geo
+library(censusapi)
+library(mapview)
+```
+
+#
+pge_20_elec <- readRDS("pge_20_elec.rds")
+pge_final <-
+  pge_20_elec %>% 
+  filter(
+    CUSTOMERCLASS %in% 
+      c(
+        "Elec- Residential",
+        "Elec- Commercial"
+      )
+  ) %>% 
+  select(
+    -c(YEAR, COMBINED, AVERAGEKWH)
+  ) %>% 
+  group_by(MONTH, CUSTOMERCLASS) %>% 
+  summarize(
+    TOTALKWH = 
+      sum(
+        TOTALKWH, 
+        na.rm = T
+      ),
+    TOTALCUSTOMERS =
+      sum(
+        TOTALCUSTOMERS,
+        na.rm = T
+      )
+  ) %>% 
+  mutate(
+    AVERAGEKWH =
+      TOTALKWH/TOTALCUSTOMERS
+  )
+
+
+tigris chapter2.1
+sf is supporting some functions in tigris so remember to load sf as well
+```{r}
+ca_counties <- counties("CA", cb = T, progress_bar = F) #function from tigris
+```
+
+```{r}
+mapview(ca_counties)
+```
+
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+library(censusapi)
+
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+
+acs_vars_2019_5yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs5",
+    type = "variables"
+  )
+```
+

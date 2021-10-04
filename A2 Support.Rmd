@@ -1,0 +1,163 @@
+---
+title: "A2 Support"
+author: "Derek Ouyang"
+date: "9/16/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r, include = F}
+knitr::opts_chunk$set(warning = F, message = F)
+```
+```{r}
+library(tigris)
+library(tidyverse)
+library(sf)
+library(mapview)
+library(leaflet)
+library(censusapi)
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+This assignment builds directly off of material from Chapter 2, so start by preparing 2020 data for your place of interest. 
+Make sure you are using the developer version of `tigris`, as explained in Chapter 2.3, which will let you grab 2020 block shapefiles correctly.
+```{r}
+dec_vars_2020 <-
+  listCensusMetadata(___)
+smc_pop_2020 <-
+  getCensus(___) %>% 
+  transmute(
+    GEOID20 = ___,
+    pop_2020 = ___
+  )
+blocks_2020 <- blocks(___)
+```
+Next, I grab the same iplacermation for 2010. Note different variable names, which you would identify via https://api.census.gov/data/2010/dec/pl/variables.html or `dec_vars_2010`.
+```{r}
+dec_vars_2010 <-
+  listCensusMetadata(___)
+smc_pop_2010 <-
+  getCensus(___) %>% 
+  transmute(
+    GEOID10 = ___,
+    pop_2010 = ___
+  )
+blocks_2010 <- blocks(___)
+```
+Now, to begin constructing our aligned geometry set, I first choose to define my set of mapped blocks as the 2010 blocks whose centroids lie within the (default 2019) place boundary. You specify your own selected place below.
+```{r}
+place_boundary <- places(___) %>% 
+  filter(NAME == "___")
+place_blocks_2010 <- blocks_2010 %>% 
+  st_centroid() %>% 
+  .[___, ] %>% 
+  st_drop_geometry() %>% 
+  left_join(___ %>% select(___)) %>% 
+  st_as_sf() %>% 
+  select(___) %>% 
+  left_join(___)
+mapview(___) + mapview(___, alpha.regions = 0, color = "red", lwd = 2)
+```
+Next, to perform spatial subsetting, we'll need all 2020 blocks that intersect with 2010 blocks.
+```{r}
+place_blocks_2020 <- blocks_2020 %>%
+  .[___, ] %>% 
+  select(___) %>% 
+  left_join(___)
+```
+Now, I follow the spatial subsetting method shown in Chapter 2.4.
+```{r}
+place_blocks_2020_intersect <- place_blocks_2020 %>% 
+  st_transform(___) %>% 
+  mutate(original_area = ___) %>% 
+  st_intersection(
+    ___ %>%
+      select(___) %>% 
+      st_transform(___)
+  ) %>% 
+  mutate(
+    leftover_area = ___,
+    perc_area = as.numeric(___ / ___),
+    pop_2020 = ___ * ___
+  )
+```
+At this point, the dataframe has both GEOID20 and GEOID10 IDs. The GEOID10 IDs tell us which GEOID20 pieces can be pieced together to form the full GEOID10 shape. So we can group and summarize to get the 2020 population counts within the GEOID10 boundaries. We don't need to retain geometries at this step, since we can join this back to the 2010 data.
+```{r}
+place_blocks_2020_reshaped <- place_blocks_2020_intersect %>%
+  st_drop_geometry() %>% 
+  group_by(___) %>% 
+  summarize(
+    pop_2020 = sum(___, na.rm=T) %>% round()
+  )
+```
+Lastly, I join this to `place_blocks_2010` and compute the absolute difference. To compute density in 1000 people per square mile, I transform to a planar coordinate system with units in ft and do the appropriate math. Note that `st_area()` produces results in a "unit" class, which can be converted to regular numbers using `as.numeric()`.
+```{r}
+projection <- ___
+place_pop_2010_2020 <- place_blocks_2010 %>% 
+  left_join(___) %>% 
+  mutate(
+    absolute_pop = (___ - ___) / as.numeric(___) * 5280^2 / 1000
+  )
+```
+The SF Chronicle example has a color palette that goes from red negative values to green negative values, with white in the center. To get our color pallete to be symmetrical across 0, we need the minimum and maximum bounds to be equidistant from 0. For our absolute change, let's try stretching one bound to meet the other. Using https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf, we can identify "PiYG" as a satisfactory palette for our purposes.
+```{r}
+max <- max(abs(___), abs(___))
+absolute_pal <- colorNumeric(
+  palette = "___",
+  domain = c(-___,___)
+)
+```
+Lastly, map.
+```{r}
+leaflet(___) %>% 
+  addProviderTiles(provider = providers$CartoDB.Positron) %>% 
+  addPolygons(
+    fillColor = ~___(___),
+    label = ~round(___),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.75,
+    weight = 1
+  ) %>% 
+  addLegend(
+    pal = ___,
+    value = c(-___,___),
+    title = "___"
+  )
+```
+If you want to try multiple layers, you'll need to change some steps upstream to collect more than one field of information for each block. Then, you final leaflet step would look something like this:
+```{r}
+leaflet(___) %>% 
+  addProviderTiles(provider = providers$CartoDB.Positron) %>% 
+  addPolygons(
+    fillColor = ~___(___),
+    label = ~round(___),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.75,
+    weight = 1,
+    group = "___"
+  ) %>% 
+  addPolygons(
+    fillColor = ~___(___),
+    label = ~round(___),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.75,
+    weight = 1,
+    group = "___"
+  ) %>% 
+  addLegend(
+    pal = ___,
+    value = c(-___,___),
+    title = "___"
+  ) %>% 
+  addLayersControl(
+    baseGroups = c("___","___"),
+    position = "___",
+    options = layersControlOptions(
+      collapsed = F
+    )
+  )
+```
+You can also put layers in groups. But note: `addLayersControl()` currently does not support the toggling on/off of layers when you use `baseGroups`, which are the radio button selections. Instead you'd need to use `overlayGroups`, which are checkboxes.
+Collapse

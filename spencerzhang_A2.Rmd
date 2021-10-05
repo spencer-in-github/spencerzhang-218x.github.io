@@ -1,13 +1,25 @@
 ---
-title: "spencerzhang_A2"
-author: "Spencer Zhang"
+title: "2020 Census: Changes in population and racial makeup of Foster City neighborhoods"
+author: "by Spencer Zhang"
 date: "10/03/2021"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+
+<style type="text/css">
+  body{
+  font-family: Verdana;
+  font-size: 12pt;
+}
+</style>
+
+According to 2020 Decennial Census data, the Foster City population grew 10.7% from 2010 to 2020, with large increases in the #todo:race population.
+The data lets us see these changes down to the census blocks — areas with about 12 to 145 residents, with a rare maximum of 1324 residents per block. Here’s how each of the roughly 266 Foster City census blocks have changed in the past decade. 
+The population change in Foster City varies in both directions and amplitudes, with the largest increase of 59 people per acre and a rate of 323.7% in one block, and minor decrease rate in several others.
+Data for some census blocks may have been impacted by the coronavirus pandemic, so we advise people to focus on overall trends rather than individual block-level details.
 ```{r, include = F}
-knitr::opts_chunk$set(warning = F, message = F)
+knitr::opts_chunk$set(echo = F, warning = F, message = F) #echo = F to mask the code chunks
 ```
 ```{r}
 library(tigris)
@@ -19,9 +31,8 @@ library(censusapi)
 Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
 ```
 
-This assignment builds directly off of material from Chapter 2, so start by preparing 2020 data for your place of interest. 
-Make sure you are using the developer version of `tigris`, as explained in Chapter 2.3, which will let you grab 2020 block shapefiles correctly.
 ```{r}
+#2020 metadata and pop data fetch from census
 dec_vars_2020 <-
   listCensusMetadata(name = "2020/dec/pl",
     type = "variables")
@@ -37,9 +48,8 @@ smc_pop_2020 <-
   )
 blocks_2020 <- blocks("CA", "San Mateo", year = 2020, progress_bar = F)
 ```
-
-Next, I grab the same place information for 2010. Note different variable names, which you would identify via https://api.census.gov/data/2010/dec/pl/variables.html or `dec_vars_2010`.
 ```{r}
+#2010 metadata and pop data fetch from census
 dec_vars_2010 <-
   listCensusMetadata(name = "2010/dec/pl",
     type = "variables")
@@ -56,84 +66,175 @@ smc_pop_2010 <-
 blocks_2010 <- blocks("CA", "San Mateo", year = 2010, progress_bar = F)
 ```
 
-Now, to begin constructing our aligned geometry set, I first choose to define my set of mapped blocks as the 2010 blocks whose centroids lie within the (default 2019) place boundary. You specify your own selected place below.
 ```{r}
-nfo_boundary <- places("CA", progress_bar = F) %>% 
-  filter(NAME == "North Fair Oaks")
+#race data fetch from census
+smc_pop_race_2020 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2020,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "group(P1)"
+  ) %>% 
+  mutate(
+    block =
+      paste0(state,county,tract,block)
+  ) %>% 
+  select(!c(GEO_ID,state,county,tract,NAME) & !ends_with(c("NA"))) %>% 
+  pivot_longer(
+    ends_with("N"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    dec_vars_2020 %>% 
+      select(name, label)
+  ) %>% 
+  select(-name) %>% 
+  separate(
+    label,
+    into = c(NA,NA,"category1","category2"),
+    sep = "!!"
+  )
+```
+```{r}
+smc_pop_race_2010 <-
+  getCensus(
+    name = "dec/pl",
+    vintage = 2010,
+    region = "block:*", 
+    regionin = "state:06+county:081",
+    vars = "group(P1)"
+  ) %>% 
+  mutate(
+    block =
+      paste0(state,county,tract,block)
+  ) %>% 
+  select(!c(GEO_ID,state,county,tract,NAME) & !ends_with(c("NA"))) %>% 
+  pivot_longer(
+    starts_with("P"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    dec_vars_2010 %>% 
+      select(name, label)
+  ) %>% 
+  select(-name) %>% 
+  separate(
+    label,
+    into = c(NA,NA,"category1","category2"),
+    sep = "!!"
+  )
+```
 
-nfo_blocks_2010 <- blocks_2010 %>% 
+```{r}
+#Foster City as the study object
+#get foster city's boundary
+fc_boundary <- places("CA", progress_bar = F) %>% 
+  filter(NAME == "Foster City")
+
+#get 2010 foster city's block geo info from smc
+fc_blocks_2010 <- blocks_2010 %>% 
   st_centroid() %>% 
-  .[nfo_boundary, ] %>% 
+  .[fc_boundary, ] %>% 
   st_drop_geometry() %>% 
   left_join(blocks_2010 %>% select(GEOID10, geometry)) %>% 
   st_as_sf() %>% 
   select(GEOID10) %>% 
   left_join(smc_pop_2010 %>% select(GEOID10, pop_2010))
 
-mapview(nfo_blocks_2010) + mapview(nfo_blocks_2010, alpha.regions = 0, color = "red", lwd = 2)
+#mapview(fc_blocks_2010) + mapview(fc_blocks_2010, alpha.regions = 0, color = "red", lwd = 2)
 ```
 
-Next, to perform spatial subsetting, we'll need all 2020 blocks that intersect with 2010 blocks.
 ```{r}
-nfo_blocks_2020 <- blocks_2020 %>%
-  .[nfo_boundary, ] %>%  #is nfo_boundary right?
+#get fc 2020 block&pop info
+fc_blocks_2020 <- blocks_2020 %>%
+  .[fc_boundary, ] %>%  #is nfo_boundary right?
   select(GEOID20) %>% 
   left_join(smc_pop_2020)
 ```
 
-Now, I follow the spatial subsetting method shown in Chapter 2.4.
 ```{r}
-nfo_blocks_2020_intersect <- nfo_blocks_2020 %>% 
-  st_transform(26910) %>% #transform????
+#spatial subsetting
+#cut 2020's block into 2010's boundary and sum the pop
+  #basically matching 2020 pop into 2010 block
+fc_blocks_2020_intersect <- fc_blocks_2020 %>% 
+  st_transform(26910) %>% #transform to a planar coordinate so that we can cut the area up
   mutate(original_area = st_area(.)) %>% 
   st_intersection(
-    nfo_blocks_2010 %>%
+    fc_blocks_2010 %>%
       select(GEOID10) %>% 
       st_transform(26910)
-  ) %>% 
+  ) %>% #return the intersection geometry of b2020 and b2010 / cutting b2020 into more pieces using b2010 and join the 2010 columns to the return sf as well (here just GEOID10 cause we did 'select')
   mutate(
     leftover_area = st_area(.),
     perc_area = as.numeric(leftover_area / original_area),
     pop_2020 = pop_2020 * perc_area
   )
+#return val
+#names(fc_blocks_2020_intersect)
+#[1] "GEOID20"       "pop_2020"      "original_area"
+#[4] "GEOID10"       "geometry"      "leftover_area"
+#[7] "perc_area"  
 ```
 
-At this point, the dataframe has both GEOID20 and GEOID10 IDs. The GEOID10 IDs tell us which GEOID20 pieces can be pieced together to form the full GEOID10 shape. So we can group and summarize to get the 2020 population counts within the GEOID10 boundaries. We don't need to retain geometries at this step, since we can join this back to the 2010 data.
 ```{r}
-nfo_blocks_2020_reshaped <- nfo_blocks_2020_intersect %>%
+#sum up the 2020 pop in the 2010 block
+fc_blocks_2020_reshaped <- fc_blocks_2020_intersect %>%
   st_drop_geometry() %>% 
   group_by(GEOID10) %>% 
   summarize(
     pop_2020 = sum(pop_2020, na.rm=T) %>% round()
-  )
+  ) 
+#return val
+#names(fc_blocks_2020_reshaped)
+#[1] "GEOID10"  "pop_2020"
 ```
 
-Lastly, I join this to `place_blocks_2010` and compute the absolute difference. To compute density in 1000 people per square mile, I transform to a planar coordinate system with units in ft and do the appropriate math. Note that `st_area()` produces results in a "unit" class, which can be converted to regular numbers using `as.numeric()`.
 ```{r}
-projection <- "+proj=longlat +datum=WGS84 +units=ft +no_defs"
-nfo_pop_2010_2020 <- nfo_blocks_2010 %>% 
-  left_join(nfo_blocks_2020_reshaped) %>% 
+#density change
+projection <- "+proj=longlat +datum=WGS84 +units=ft +no_defs" #todo: dont know where this goes
+fc_pop_2010_2020 <- fc_blocks_2010 %>% 
+  left_join(fc_blocks_2020_reshaped) %>% 
   mutate(
-    absolute_pop = (pop_2020 - pop_2010) / as.numeric(st_area(.)) * 5280^2 / 1000
+    absolute_pop = (pop_2020 - pop_2010) / (as.numeric(st_area(.)) * 0.00024710538146717)
+  )
+#return
+# "absolute_pop" in fc_pop_2010_2020
+```
+
+```{r}
+#percentage change
+#todo: change into pipeline
+fc_pop_2010_2020$pop_perc = case_when( 
+  fc_pop_2010_2020$pop_2010 == 0 & !fc_pop_2010_2020$pop_2020 == 0 ~100,
+  fc_pop_2010_2020$pop_2010 == 0 & fc_pop_2010_2020$pop_2020 == 0 ~0,
+  TRUE ~ (fc_pop_2010_2020$pop_2020 - fc_pop_2010_2020$pop_2010)/fc_pop_2010_2020$pop_2010
   )
 ```
 
-The SF Chronicle example has a color palette that goes from red negative values to green negative values, with white in the center. To get our color pallete to be symmetrical across 0, we need the minimum and maximum bounds to be equidistant from 0. For our absolute change, let's try stretching one bound to meet the other. Using https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf, we can identify "PiYG" as a satisfactory palette for our purposes.
 ```{r}
-max <- max(abs(min(nfo_pop_2010_2020$absolute_pop)), abs(max(nfo_pop_2010_2020$absolute_pop)))
+#Original comment
+#To get our color pallete to be symmetrical across 0, we need the minimum and maximum bounds to be equidistant from 0. For our absolute change, let's try stretching one bound to meet the other. Using https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf, we can identify "PiYG" as a satisfactory palette for our purposes.
+
+#get color pallete for density change
+max <- max(abs(min(fc_pop_2010_2020$absolute_pop)), abs(max(fc_pop_2010_2020$absolute_pop)))
 absolute_pal <- colorNumeric(
   palette = "PiYG",
   domain = c(-max,max)
 )
 ```
 
-Lastly, map.
+## Population change in Foster City census blocks from 2010 to 2020
+Mouse over a block for details.
 ```{r}
-leaflet(data = nfo_pop_2010_2020) %>% 
+#map for density change
+leaflet(data = fc_pop_2010_2020) %>% 
   addProviderTiles(provider = providers$CartoDB.Positron) %>% 
   addPolygons(
     fillColor = ~absolute_pal(absolute_pop),
-    label = ~round(as.numeric(geometry)),
+    label = ~round(absolute_pop),
     color = "white",
     opacity = 0.5,
     fillOpacity = 0.75,
@@ -142,37 +243,60 @@ leaflet(data = nfo_pop_2010_2020) %>%
   addLegend(
     pal = absolute_pal,
     value = c(-max,max),
-    title = "Population Percentage Change in North Fair Oaks City from 2010 to 2020")
+    title = "Population Density Change<br>in Foster City<br>from 2010 to 2020<br>(unit:per acre)")
 ```
 
-If you want to try multiple layers, you'll need to change some steps upstream to collect more than one field of information for each block. Then, you final leaflet step would look something like this:
+## Population percentage change in Foster City census blocks from 2010 to 2020
+Mouse over a block for details.
+```{r}
+perc_max <- max(abs(min(fc_pop_2010_2020$pop_perc)), abs(max(fc_pop_2010_2020$pop_perc)))
+perc_pal <- colorNumeric(
+  palette = "PiYG",
+  domain = c(-perc_max,perc_max)
+)
 
-{r}
-leaflet(data = nfo_pop_2010_2020) %>% 
+leaflet(data = fc_pop_2010_2020) %>% 
   addProviderTiles(provider = providers$CartoDB.Positron) %>% 
   addPolygons(
-    fillColor = ~___(___),
-    label = ~round(___),
+    fillColor = ~perc_pal(pop_perc),
+    label = ~round(pop_perc),
     color = "white",
     opacity = 0.5,
     fillOpacity = 0.75,
-    weight = 1,
-    group = "___"
-  ) %>% 
-  addPolygons(
-    fillColor = ~___(___),
-    label = ~round(___),
-    color = "white",
-    opacity = 0.5,
-    fillOpacity = 0.75,
-    weight = 1,
-    group = "___"
+    weight = 1
   ) %>% 
   addLegend(
-    pal = ___,
-    value = c(-___,___),
-    title = "___"
+    pal = perc_pal,
+    value = c(-perc_max,perc_max),
+    title = "Population Percentage Change<br>in Foster City<br>from 2010 to 2020<br>(unit:%)")
+```
+
+```{r eval = F}
+If you want to try multiple layers, you'll need to change some steps upstream to collect more than one field of information for each block. Then, you final leaflet step would look something like this:
+
+#todo layering
+leaflet(data = fc_pop_2010_2020) %>% 
+  addProviderTiles(provider = providers$CartoDB.Positron) %>% 
+  addPolygons(
+    fillColor = ~absolute_pal(absolute_pop),
+    label = ~round(absolute_pop),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.75,
+    weight = 1
   ) %>% 
+  addPolygons(
+    fillColor = ~perc_pal(pop_perc),
+    label = ~round(pop_perc),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.75,
+    weight = 1
+  ) %>% 
+  addLegend(
+    pal = absolute_pal,
+    value = c(-max,max),
+    title = "Population Density Change<br>in Foster City<br>from 2010 to 2020") %>% 
   addLayersControl(
     baseGroups = c("___","___"),
     position = "___",
@@ -181,6 +305,6 @@ leaflet(data = nfo_pop_2010_2020) %>%
     )
   )
 
-
 You can also put layers in groups. But note: `addLayersControl()` currently does not support the toggling on/off of layers when you use `baseGroups`, which are the radio button selections. Instead you'd need to use `overlayGroups`, which are checkboxes.
 Collapse
+```

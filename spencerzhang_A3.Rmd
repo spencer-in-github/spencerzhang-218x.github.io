@@ -1,0 +1,165 @@
+---
+title: "spencerzhang_A3"
+author: "Spencer Zhang"
+date: "10/10/2021"
+output:
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+```{r}
+library(censusapi)
+library(tidyverse)
+library(tigris)
+library(sf)
+library(leaflet)
+
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r}
+#load data
+temp <- tempfile()
+download.file("https://www2.census.gov/programs-surveys/acs/data/pums/2019/1-Year/csv_hca.zip",destfile = temp)
+
+pums_hca_2019_1yr <- read_csv(unzip(temp,"psam_h06.csv"))
+
+unlink(temp)
+```
+
+```{r}
+#get data with choosen parameters
+pums_2019_1yr <- getCensus(
+  name = "acs/acs1/pums",
+  vintage = 2019,
+  region = "public use microdata area:*", 
+  regionin = "state:06",
+  vars = c(
+    "SERIALNO",
+    "SPORDER",
+    "PWGTP",
+    "WGTP",
+    "NP",
+    "HHL",
+    "HINCP",
+    "TEN",
+    "DIS", #disability
+    "DDRS", #self-care diffi
+    "DOUT", #indep living diffi
+    "DPHY", #ambulatory diffi
+    "FER" #gave birth within12m
+  )
+)
+```
+
+```{r}
+#filter out bay area data
+ca_pumas <-
+  pumas("CA", cb = T, progress_bar = F)
+
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+bay_counties <-
+  counties("CA", cb = T, progress_bar = F) %>%
+  filter(NAME %in% bay_county_names)
+
+bay_pumas <-
+  ca_pumas %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_drop_geometry() %>% 
+  left_join(ca_pumas %>% select(GEOID10)) %>% 
+  st_as_sf()
+
+bay_pums <-
+  pums_2019_1yr %>% 
+  mutate(
+    PUMA = str_pad(public_use_microdata_area,5,"left","0")
+  ) %>% 
+  filter(PUMA %in% bay_pumas$PUMACE10)
+```
+
+# Geographic distribution of heat-related sensitive groups in the Bay Areas
+Extreme weathers have been observed more frequently and more severe over the past few years due to global climate change. Among them, frequent heat waves strike the dry, sunny Bay Area constantly during summer times, and certain subpopulation of the Bay Area is more at-risk for such extreme weather incidents.
+Below is a map of heat-sensitive group distribution, showing the locations of concentrations of sub-population particularly at-risk of extreme heat impacts, which are population with medical disability, self-care difficulty, and households with pregnancy and infants.
+Such population may need extra community support during heatwaves, for example, extra power for medical equipment.
+```{r}
+#SENSITIVE GROUP
+#disability group; infant
+bay_pums_sensitive <-
+  bay_pums %>% 
+  filter(!duplicated(SERIALNO)) %>% 
+  mutate(
+    WGTP = as.numeric(WGTP),
+    sensitive_group = ifelse(
+      (DIS == 1) |
+        (DDRS == 1) |
+        (DOUT == 1) |
+        (DPHY == 1) |
+        (FER == 1),
+      WGTP,
+      0
+    )
+  ) %>% 
+  group_by(PUMA) %>% 
+  summarize(
+    perc_sensitive_group =
+      sum(sensitive_group, na.rm =T)/sum(WGTP, na.rm = T)*100
+  ) %>% 
+  left_join(
+    bay_pumas %>% 
+      select(PUMACE10),
+    by = c("PUMA" = "PUMACE10")
+  ) %>% 
+  st_as_sf()
+```
+
+```{r}
+#SENSITIVE GROUP plot
+pums_pal <- colorNumeric(
+  palette = "Oranges",
+  domain = bay_pums_sensitive$perc_sensitive_group
+)
+
+leaflet() %>%
+  addTiles() %>% 
+  addPolygons(
+    data = bay_pums_sensitive,
+    fillColor = ~pums_pal(perc_sensitive_group),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.5,
+    weight = 1,
+    label = ~paste0(
+      round(perc_sensitive_group), 
+      "% heat-sensitive groups (disability, self-care difficulty, infant-present households)"
+    ),
+    highlightOptions = highlightOptions(
+      weight = 2,
+      opacity = 1
+    )
+  ) %>% 
+  addLegend(
+    data = bay_pums_sensitive,
+    pal = pums_pal,
+    values = ~perc_sensitive_group,
+    title = "% heat-sensitive groups (disability, self-care difficulty, infant-present households)"
+  )
+```
+

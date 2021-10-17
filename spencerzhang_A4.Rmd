@@ -408,7 +408,7 @@ bay_latinx_over %>%
     title = "Latin 25+ Population with no college degree \nis [Y] times over-represented, relative to % Latinx in overall population"
   ) +
   theme(
-    legend.position = "bottom",
+    legend.position = "right",
     legend.direction = "vertical"
   )
 ```

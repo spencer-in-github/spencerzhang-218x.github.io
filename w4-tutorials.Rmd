@@ -1,0 +1,185 @@
+---
+title: "Untitled"
+author: "Spencer Zhang"
+date: "10/12/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(censusapi)
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+```{r}
+acs_vars_2019_5yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs5",
+    type = "variables"
+  )
+```
+
+```{r}
+#id = c("A","B","C","D","E","F","G","H")
+bay_income_white <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = "group(B19001A)"
+  ) %>%
+  select(ends_with("E") & -c(state, NAME)) %>% #income tiers with number of households 
+  summarize_all(sum) %>% #a shortcut of summarize() where keeps all the columns; sum up all the households in a single income tier
+  pivot_longer(everything(), names_to = "name", values_to = "estimate") %>% #transpose the dataframe 
+  left_join(
+    acs_vars_2019_5yr %>% 
+      select(name, label),
+    by = c("name")) %>%
+  separate(
+    col = "label",
+    sep = "!!",
+    into = c(NA,NA, "income")
+  ) %>%
+  select(-name) %>%
+  filter(!is.na(income)) %>% #filter out the rows of income being NAs
+  mutate(race = "white only")
+  
+
+```
+
+```{r}
+#all race categories
+census_race_categories <- 
+  c(
+    "White Alone",
+    "Black or African American",
+    "American Indian and Alaska Native Alone",
+    "Asian Alone",
+    "Native Hawaiian and Other Pacific Islander Alone",
+    "Some Other Race Alone",
+    "Two or More Races"
+  )
+
+#all the group name predix A to G
+LETTERS[1:7]
+```
+
+```{r}
+#loop through races
+
+#todo for education B06009
+
+bay_income_race <-
+  1:7 %>%  #loop
+  map_dfr(function(x){
+    getCensus(
+      name = "acs/acs5",
+      vintage = 2019,
+      region = "county:001,013,041,055,075,081,085,095,097",
+      regionin = "state:06",
+      vars = paste0("group(B19001",LETTERS[x],")")
+    ) %>% #different var names for the seven races
+      select(ends_with("E") & -c(state, NAME)) %>%
+      pivot_longer(
+        everything(), 
+        names_to = "name", 
+        values_to = "estimate") %>%
+      left_join(
+        acs_vars_2019_5yr %>% 
+          select(name, label)
+      ) %>% 
+      select(-name) %>% 
+      separate(
+        label,
+        into = c(NA,NA,"income"),
+        sep = "!!"
+      ) %>% 
+      filter(!is.na(income)) %>% 
+      mutate(race = census_race_categories[x])
+  })
+```
+
+```{r}
+#alternative way to loop
+full_dataset <- NULL
+
+for(x in 1:7){
+  
+  # temp <- your code
+  
+  full_dataset <-
+    rbind(full_dataset, temp)
+  
+}
+```
+
+```{r}
+#plot
+bay_income_race %>% 
+  group_by(income, race) %>% 
+  summarize(estimate = sum(estimate)) %>% 
+  ggplot() +
+  geom_bar(
+    aes(
+      x = income %>% factor(levels = rev(unique(bay_income_race$income))),
+      y = estimate,
+      fill = race %>% factor(levels = rev(unique(bay_income_race$race)))
+    ),
+    stat = "identity",
+    position = "fill" #note: switch between fill/stack to see the difference
+  ) +
+  labs(
+    x = "Household income",
+    y = "Number of households",
+    title = "Bay Area household income by race",
+    fill = "Race of householder"
+  ) + coord_flip() +
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical"
+  )  +
+  guides(
+    fill = guide_legend(
+      reverse = T
+    )
+  )
+```
+
+```{r}
+#plot example
+bay_edu_all %>% 
+  group_by(education, race) %>% 
+  summarize(estimate = sum(estimate)) %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = education %>% factor(levels = rev(unique(bay_edu_all$education))),
+      y = estimate,
+      fill = race %>% factor(levels = rev(unique(bay_edu_all$race)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) + 
+  labs(
+    x = "Educational attainment",
+    y = "Population",
+    title = "Bay Area educational attainment by ethnicity",
+    fill = "Ethnicity"
+  ) + coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  )  +
+  guides(
+    fill = guide_legend(
+      reverse = T
+    )
+  )
+```
+

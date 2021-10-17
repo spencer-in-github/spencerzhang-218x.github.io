@@ -1,0 +1,415 @@
+---
+title: "spencerzhang_A4"
+author: "Spencer Zhang"
+date: "10/16/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Equity analysis on educational attainment by ethnicity groups in the Bay Area
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+```{r}
+#library
+library(tidyverse)
+library(censusapi)
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r}
+#load census metadata
+acs_vars_2019_5yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs5",
+    type = "variables"
+  )
+```
+
+```{r}
+census_race_categories <- 
+  c(
+    "White Alone",
+    "Black or African American",
+    "American Indian and Alaska Native Alone",
+    "Asian Alone",
+    "Native Hawaiian and Other Pacific Islander Alone",
+    "Some Other Race Alone",
+    "Two or More Races"
+  )
+```
+
+```{r}
+#loop
+bay_edu <-
+  1:7 %>%  #loop
+  map_dfr(function(x){
+    getCensus(
+      name = "acs/acs5",
+      vintage = 2019,
+      region = "county:001,013,041,055,075,081,085,095,097",
+      regionin = "state:06",
+      vars = paste0("group(C15002",LETTERS[x],")")
+    ) %>% #different var names for the seven races
+      select(ends_with("E")&-c(state, NAME)) %>%
+      summarise_all(sum) %>%
+      pivot_longer(everything(),
+               names_to = "name",
+               values_to = "estimate") %>%
+      left_join(
+        acs_vars_2019_5yr %>%
+          select(name,label),
+        by = c("name")
+        ) %>%
+      separate(
+        col = "label",
+        sep = "!!",
+        into = c(NA,NA, NA, "education")
+        ) %>%
+      filter(!is.na(education)) %>%
+      group_by(education) %>%
+      summarise(estimate = sum(estimate)) %>%
+      mutate(race = census_race_categories[x])
+  })
+```
+## 1 Educational attainment by race
+Educational attainment shows disparity among difference race population. White alone enjoys a generally higher level of education whereas other races have a generally lower level. Educational levels are polarized within Asian groups.
+```{r}
+#plot
+bay_edu %>% 
+  group_by(education, race) %>% 
+  summarize(estimate = sum(estimate)) %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = education %>% factor(levels = rev(unique(bay_edu$education))),
+      y = estimate,
+      fill = race %>% factor(levels = rev(unique(bay_edu$race)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) + 
+  labs(
+    x = "Educational attainment",
+    y = "Population",
+    title = "Bay Area educational attainment by race",
+    fill = "Race"
+  ) + coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  )  +
+  guides(
+    fill = guide_legend(
+      reverse = T
+    )
+  )
+```
+
+```{r}
+#latinx
+latinx_race_categories <- 
+  c(
+    "White, not Latinx",
+    "Latinx",
+    "Not white, not Latinx"
+  )
+
+bay_edu_latinx <-
+  8:9 %>%  #loop
+  map_dfr(function(x){
+    getCensus(
+      name = "acs/acs5",
+      vintage = 2019,
+      region = "county:001,013,041,055,075,081,085,095,097",
+      regionin = "state:06",
+      vars = paste0("group(C15002",LETTERS[x],")")
+    ) %>% #different var names for the seven races
+      select(ends_with("E")&-c(state, NAME)) %>%
+      summarise_all(sum) %>%
+      pivot_longer(everything(),
+               names_to = "name",
+               values_to = "estimate") %>%
+      left_join(
+        acs_vars_2019_5yr %>%
+          select(name,label),
+        by = c("name")
+        ) %>%
+      separate(
+        col = "label",
+        sep = "!!",
+        into = c(NA,NA, NA, "education")
+        ) %>%
+      filter(!is.na(education)) %>%
+      group_by(education) %>%
+      summarise(estimate = sum(estimate)) %>%
+      mutate(race = latinx_race_categories[x-7])
+  })
+```
+
+```{r}
+bay_edu_all <-
+  bay_edu %>%
+  group_by(education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  mutate(race = "total") %>%
+  left_join(
+    ., bay_edu_latinx %>%
+  group_by(education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  mutate(race = "White and Latinx"),
+  by = "education"
+  ) %>%
+  mutate(
+    estimate = estimate.x - estimate.y,
+    race = "Not White, not Latinx"
+  ) %>%
+  select(education,estimate,race) %>%
+  rbind(., bay_edu_latinx)
+```
+## 2 Educational attainment by ethnicity groups, focusing on latinx
+The educational level disparity between white (not Latinx) and Latinx is severe, while the other remaining ethnicity groups appear homogeneous.
+```{r}
+bay_edu_all %>% 
+  group_by(education, race) %>% 
+  summarize(estimate = sum(estimate)) %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = education %>% factor(levels = rev(unique(bay_edu_all$education))),
+      y = estimate,
+      fill = race %>% factor(levels = rev(unique(bay_edu_all$race)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) + 
+  labs(
+    x = "Educational attainment",
+    y = "Population",
+    title = "Bay Area educational attainment by ethnicity",
+    fill = "Ethnicity"
+  ) + coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  )  +
+  guides(
+    fill = guide_legend(
+      reverse = T
+    )
+  )
+```
+
+```{r}
+acs_vars_2019_1yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs1",
+    type = "variables"
+  )
+```
+
+```{r}
+bay_latinx_2019 <-
+  getCensus(
+    name = "acs/acs1",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06", #BAY AREA DATA
+    vars = "group(C15002I)" #latinx
+  ) %>%
+  select(ends_with("E")&-c(state, NAME)) %>%
+  mutate(
+    county = c(001,013,041,055,075,081,085,095,097)
+  ) %>%
+  pivot_longer(!county,
+               names_to = "name",
+               values_to = "estimate") %>%
+  left_join(
+    acs_vars_2019_1yr %>%
+      select(name,label),
+    by = c("name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    col = "label",
+    sep = "!!",
+    into = c(NA,NA,NA, "education")
+  ) %>%
+  filter(!is.na(education)) %>%
+  group_by(county,education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  mutate(education = ifelse(
+           education == "High school graduate (includes equivalency)"| education == "Less than high school diploma", "no college", "college"
+         )) %>%
+  group_by(county,education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  group_by(county) %>%
+  summarise(
+    estimate, education,
+    total = sum(estimate),
+    perc = estimate/total
+  ) %>%
+  filter(education == "no college") %>%
+  select(county,perc) %>%
+  mutate(year = 2019, ethnicity = "latinx")
+
+```
+
+```{r}
+#loop for 2006 to 2019
+yr <- c(2006:2019)
+bay_latinx <-
+  yr %>%
+  map_dfr(function(x){
+    getCensus(
+    name = "acs/acs1",
+    vintage = x,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06", #BAY AREA DATA
+    vars = "group(C15002I)" #latinx
+  ) %>%
+  select(ends_with("E")&-c(state)) %>%
+      separate(
+        col = "NAME",
+        sep = " County",
+        into = c("county",NA)
+      ) %>%
+  pivot_longer(!county,
+               names_to = "name",
+               values_to = "estimate") %>%
+  left_join(
+    acs_vars_2019_1yr %>%
+      select(name,label),
+    by = c("name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    col = "label",
+    sep = "!!",
+    into = c(NA,NA,NA, "education")
+  ) %>%
+  filter(!is.na(education)) %>%
+  group_by(county,education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  mutate(education = ifelse(
+           education == "High school graduate (includes equivalency)"| education == "Less than high school diploma", "no college", "college"
+         )) %>%
+  group_by(county,education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  group_by(county) %>%
+  summarise(
+    estimate, education,
+    total = sum(estimate),
+    perc = estimate/total
+  ) %>%
+  filter(education == "no college") %>%
+  select(county,perc) %>%
+  mutate(year = x)
+  })
+```
+
+```{r}
+level_edu <- c(
+  "No schooling completed",
+  "Nursery to 4th grade",
+  "5th and 6th grade",
+  "7th and 8th grade",
+  "9th grade",
+  "10th grade",
+  "11th grade",
+  "12th grade, no diploma",
+  "High school graduate (includes equivalency)",
+  "Some college, less than 1 year",
+  "Some college, 1 or more years, no degree",
+  "Associate's degree",
+  "Bachelor's degree",
+  "Master's degree",
+  "Professional school degree",
+  "Doctorate degree" 
+)
+```
+
+```{r}
+bay_edu_total <-
+  yr %>%
+  map_dfr(function(x){
+    getCensus(
+    name = "acs/acs1",
+    vintage = x,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06", #BAY AREA DATA
+    vars = "group(B15002)" #latinx
+  ) %>%
+  select(ends_with("E")&-state) %>%
+  separate(
+      col = "NAME",
+      sep = " County",
+      into = c("county",NA)
+      ) %>%
+  pivot_longer(!county,
+               names_to = "name",
+               values_to = "estimate") %>%
+  left_join(
+    acs_vars_2019_1yr %>%
+      select(name,label),
+    by = c("name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    col = "label",
+    sep = "!!",
+    into = c(NA,NA,NA, "education")
+  ) %>%
+  filter(!is.na(education)) %>%
+  mutate(
+    education = ifelse(
+      education %in% level_edu[1:9], "no college", "college"
+    )
+  ) %>%
+  group_by(county,education) %>%
+  summarise(estimate = sum(estimate)) %>%
+  group_by(county) %>%
+  summarise(
+    estimate, education,
+    total = sum(estimate),
+    perc = estimate/total
+  ) %>%
+  filter(education == "no college") %>%
+  select(county,perc) %>%
+      mutate(year = x)
+  })
+```
+
+```{r}
+bay_latinx_over <-
+  left_join(bay_latinx,bay_edu_total,by = c("county","year")) %>%
+  mutate(
+    over = perc.x/perc.y
+  ) %>%
+  select(-c(perc.x, perc.y))
+```
+## 3 Latinx group educational attainment overrepresentation in year 2006 to 2019 in the Bay Area
+The educational attainment level of the Latinx group in the Bay Area is significantly over-represented by the total population. Below shows how much Latinx population (25 years old and above) with no college degree is over-represented by the total populatin in the specified county. Among nine counties in the Bay Area, the educational attainment issue appears most pressing in Marin County. ALl nine counties are over-represented.
+```{r}
+bay_latinx_over %>%
+  group_by(county) %>%
+  ggplot() +
+  geom_line(
+    aes(
+      x = year,
+      y = over,
+      color = county
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "Y",
+    title = "Latin 25+ Population with no college degree \nis [Y] times over-represented, relative to % Latinx in overall population"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  )
+```
+

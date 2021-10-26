@@ -1,0 +1,244 @@
+---
+title: "spencerzhang_A5"
+author: "Spencer Zhang"
+date: "10/21/2021"
+output: bookdown::html_document2
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+```{r library}
+library(tidyverse)
+library(censusapi)
+library(sf)
+library(tigris)
+library(readxl)
+library(leaflet)
+```
+
+```{r data-download, eval = F}
+temp <- tempfile()
+download.file("https://oehha.ca.gov/media/downloads/calenviroscreen/document/calenviroscreen40resultsdatadictionaryf2021.zip",destfile = temp)
+ces4 <- read_excel(
+  unzip(
+    temp, 
+    "calenviroscreen40resultsdatadictionary_F_2021.xlsx"
+  ), 
+  sheet = "CES4.0FINAL_results"
+)
+unlink(temp)
+```
+
+```{r data-reading-file}
+ces4 <- read_xlsx('calenviroscreen40resultsdatadictionary_F_2021.xlsx')
+```
+
+```{r data-clean}
+#in class note
+ces4_clean <- ces4 %>% dplyr::select(!ends_with("Pctl")) #exclude the percentile columns
+sum(is.na(ces4_clean$Poverty)) #75 rows with no data; cant do lm with
+```
+
+```{r}
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+ca_tracts <- tracts("CA", cb = T, progress_bar = F)
+
+ces4_bay_pm25 <-
+  ces4 %>% 
+  filter(`California County` %in% bay_county_names) %>% 
+  select(`Census Tract`, PM2.5) %>% 
+  left_join(
+    ca_tracts %>% 
+      transmute(GEOID = as.numeric(GEOID)), 
+    by = c("Census Tract" = "GEOID")
+  ) %>% 
+  st_as_sf()
+```
+
+# Mapview
+
+```{r pm25-map, fig.align='center', fig.cap='Map of CalEnvioScreen PM2.5 concentration for Bay Area census tracts'}
+pm25_pal <- colorNumeric(
+  palette = "Reds",
+  domain = ces4_bay_pm25$PM2.5
+)
+
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(
+    data = ces4_bay_pm25,
+    fillColor = ~pm25_pal(PM2.5),
+    color = "white",
+    weight = 0.5,
+    fillOpacity = 0.5,
+    label = ~PM2.5
+  )
+```
+
+```{r eval = F}
+summary(ces4_bay_pm25$PM2.5)
+```
+
+```{r asthma-map, fig.align='center', fig.cap= 'Map of CalEnvioScreen Asthma report for Bay Area census tracts'}
+#asthma
+ces4_bay_as <-
+  ces4 %>% 
+  filter(`California County` %in% bay_county_names) %>% 
+  select(`Census Tract`, Asthma) %>% 
+  left_join(
+    ca_tracts %>% 
+      transmute(GEOID = as.numeric(GEOID)), 
+    by = c("Census Tract" = "GEOID")
+  ) %>% 
+  st_as_sf()
+
+as_pal <- colorNumeric(
+  palette = "Reds",
+  domain = ces4_bay_pm25$Asthma
+)
+
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(
+    data = ces4_bay_as,
+    fillColor = ~as_pal(Asthma),
+    color = "white",
+    weight = 0.5,
+    fillOpacity = 0.5,
+    label = ~Asthma
+  )
+```
+
+# Scatterplot
+
+```{r}
+df <- ces4 %>% 
+  filter(`California County` %in% bay_county_names) %>% 
+  select(`Census Tract`, PM2.5, Asthma) %>% 
+  drop_na() %>%
+  left_join(
+    ca_tracts %>% 
+      transmute(GEOID = as.numeric(GEOID)), 
+    by = c("Census Tract" = "GEOID")
+  )
+```
+
+Below is a scatterplot of PM2.5 versus Asthma report in each census tract in the Bay Area (Fig \@ref(fig:scatter)). The fitted line shown is not the best regression for the given data. The distribution of data points is not symmetric along both sides of the fitted line, i.e. the residuals of the data points are not normally distributed.
+
+```{r scatter, fig.align='center', fig.cap='Scatterplot for PM2.5 and Asthma in the Bay Area'}
+ggplot(
+  data = df,
+  aes(
+      x = PM2.5,
+      y = Asthma
+    )
+) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+# Linear regression
+
+```{r lm-model}
+model <- lm(Asthma ~PM2.5, df)
+```
+
+Under a linear regression model of (Asthma \~ PM2.5), an increase of 1 unit in PM2.5 concentrations in the air is associated with an increase of `r model$coefficient['PM2.5']` in Asthma emergency department visits. 9.6% of the variance in asthma reports is explained by the variance in PM2.5 (or the fitted values from the model).
+
+# Residual plot
+
+The residual plot shown in Fig \@ref(fig:residual) is not symmetric and has a long tail towards positive infinite, indicating the original data is skewed and the current model can not best predict or describe the relationship between the two variables.
+
+```{r residual, fig.align='center',fig.cap='Residual density plot for linear regression model (Asthma ~ PM2.5)'}
+plot(density(residuals(model)))
+```
+
+# Log transformation
+
+```{r}
+df <- df %>%
+  mutate(
+    logPM = log(PM2.5),
+    logAs = log(Asthma)
+  )
+```
+
+The scatterplot of log-transformed PM2.5 and Asthma data is shown in Fig \@ref(fig:scatter-log). The data distribution along the fitted line seems more symmetric and spread-out than previous model.
+
+```{r scatter-log, fig.align='center', fig.cap='Scatterplot for log-transformed PM2.5 and Asthma in the Bay Area'}
+ggplot(
+  data = df,
+  aes(
+      x = logPM,
+      y = logAs
+    )
+) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+The residual for log-transformed linear model looks roughly normally distributed with a mean of 0. As compared to the previous scatterplot, it's more symmetric. IThere is no skewness or long tail towards one direction.
+
+```{r residual-log, fig.align='center', fig.cap='Residual density plot for linear regression model (logAsthma ~ logPM2.5)'}
+log_model <- lm(logAs ~logPM, df)
+plot(density(residuals(log_model)))
+```
+
+```{r}
+df <- df %>%
+  mutate(
+    r = log_model$residuals
+  ) %>%
+  st_as_sf()
+```
+
+```{r}
+#trying to make different color for negative&positive values
+
+## Make vector of colors for values smaller than 0 (20 colors)
+rc1 <- colorRampPalette(colors = c("red", "white"), space = "Lab")(20)
+
+## Make vector of colors for values larger than 0 (180 colors)
+rc2 <- colorRampPalette(colors = c("white", "green"), space = "Lab")(180)
+
+## Combine the two color palettes
+rampcols <- c(rc1, rc2)
+```
+
+# Residual map
+
+The difference between modeled asthma reports and the actual values in each tract is visualized in \@ref(residual-map). From the map we can see the tract with the lowest residual is Stanford in Santa Clara, with a negative value of -2.0. This means the model overestimates the asthma reports with the given PM2.5 data. One possible reason for the overestimation is that Stanford is populated with international residents, who usually moves in and out of the given area within a short period that may not enable the rise asthma, or they are treated outside the area.
+
+```{r residual-map, fig.align='center', fig.cap='Residual map for asthma reportage and asthma estimation from log-transformed linear model'}
+df_pal <- colorNumeric(
+  palette = "Reds",
+  domain = df$r
+)
+
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addPolygons(
+    data = df,
+    fillColor = ~df_pal(r),
+    color = "white",
+    weight = 0.5,
+    fillOpacity = 0.5,
+    label = ~r
+  )
+```

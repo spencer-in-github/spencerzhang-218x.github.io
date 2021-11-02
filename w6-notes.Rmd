@@ -1,0 +1,183 @@
+---
+title: "Untitled"
+author: "Spencer Zhang"
+date: "10/26/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+```
+
+```{r library}
+library(tidyverse)
+library(censusapi)
+library(sf)
+library(mapview)
+library(tigris)
+library(plotly)
+```
+
+```{r}
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+
+acs_vars_2019_5yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs5",
+    type = "variables"
+  )
+```
+
+```{r}
+bay_education_income_tract <- 
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "tract:*",
+    regionin = "state:06+county:001,013,041,055,075,081,085,095,097",
+    vars = c(
+      "B06009_001E",
+      "B06009_002E",
+      "B06009_003E",
+      "B19001_001E",
+      "B19001_014E",
+      "B19001_015E",
+      "B19001_016E",
+      "B19001_017E",
+      "B19001A_001E",
+      "B19001_001E"
+    )
+  ) %>% 
+  transmute(
+    tract = paste0(state, county, tract),
+    perc_college = 1 - (B06009_002E + B06009_003E) / B06009_001E,
+    perc_over100k = (B19001_014E + B19001_015E + B19001_016E + B19001_017E) / B19001_001E,
+    perc_white = B19001A_001E/B19001_001E
+  ) %>% 
+  filter(
+    !is.na(perc_college), 
+    !is.na(perc_over100k),
+    !is.na(perc_white)
+  )
+```
+
+```{r}
+plot_ly(data = bay_education_income_tract, x=~perc_white, y=~perc_college, z=~perc_over100k, type="scatter3d", mode="markers", color = ~perc_over100k)
+
+```
+
+```{r}
+library(corrgram)
+```
+
+```{r}
+corrgram(
+  bay_education_income_tract,
+  cor.method = 'pearson',
+  lower.panel = panel.pts,
+  upper.panel = panel.cor,
+  diag.panel = panel.density
+)
+```
+```{r}
+library(corrplot) #correlation matrix
+
+correlationplot <- bay_education_income_tract %>% 
+  select(
+    perc_white, 
+    perc_college,
+    perc_over100k
+  ) %>% 
+  cor()
+
+corrplot(
+  correlationplot, 
+  method = "number",
+  type = "upper"
+)
+```
+```{r lm-coeff}
+white_100k <- lm(bay_education_income_tract$perc_over100k ~ bay_education_income_tract$perc_white)
+white_100k$coefficients
+```
+
+```{r}
+white_edu <-  lm(bay_education_income_tract$perc_college ~bay_education_income_tract$perc_white)
+white_edu$coefficients
+```
+
+```{r}
+edu_100k <- lm(bay_education_income_tract$perc_over100k ~bay_education_income_tract$perc_college)
+edu_100k$coefficients
+```
+
+```{r}
+all_100k <- lm(bay_education_income_tract$perc_over100k ~bay_education_income_tract$perc_college+bay_education_income_tract$perc_white)
+all_100k$coefficients
+
+summary(all_100k)
+```
+
+```{r}
+summary(edu_100k)
+summary(white_100k)
+```
+
+```{r glm-data}
+pums_2019_1yr <- getCensus(
+  name = "acs/acs1/pums",
+  vintage = 2019,
+  region = "public use microdata area:*", 
+  regionin = "state:06",
+  vars = c(
+    "SERIALNO",
+    "SPORDER",
+    "PWGTP",
+    "WGTP",
+    "AGEP",
+    "SCHL",
+    "PINCP",
+    "RAC1P",
+    "HISP",
+    "LANX"
+  )
+)
+
+ca_pumas <-
+  pumas("CA", cb = T, progress_bar = F)
+
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+bay_counties <-
+  counties("CA", cb = T, progress_bar = F) %>%
+  filter(NAME %in% bay_county_names)
+
+bay_pumas <-
+  ca_pumas %>% 
+  st_centroid() %>% 
+  .[bay_counties, ] %>% 
+  st_drop_geometry() %>% 
+  left_join(ca_pumas %>% select(GEOID10)) %>% 
+  st_as_sf()
+
+bay_pums <-
+  pums_2019_1yr %>% 
+  mutate(
+    PUMA = str_pad(public_use_microdata_area,5,"left","0")
+  ) %>% 
+  filter(PUMA %in% bay_pumas$PUMACE10)
+```
+

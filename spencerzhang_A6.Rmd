@@ -1,0 +1,218 @@
+---
+title: "spencerzhang_A6"
+author: "Spencer Zhang"
+date: "10/28/2021"
+output: bookdown::html_document2
+editor_options: 
+  chunk_output_type: console
+---
+
+# Children's Lead Risk from housing - Inspecting and modeling
+
+In this study PUMAs data is used to inspect households with high risk of lead contamination and create a model to predict household risk in order to provide guidance for future preventative resource distribution.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+```
+
+```{r library}
+library(censusapi)
+library(tidyverse)
+library(tigris)
+library(sf)
+library(leaflet)
+
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r metadata,eval=F}
+pums_2019_1yr <- getCensus(
+  name = "acs/acs1/pums",
+  vintage = 2019,
+  region = "public use microdata area:*", 
+  regionin = "state:06",
+  vars = c(
+    "SERIALNO",
+    "SPORDER",
+    "PWGTP",
+    "WGTP",
+    "YBL",
+    "BLD",
+    "TEN",
+    "MV",
+    "NP",
+    "HINCP",
+    "AGEP"
+  )
+)
+
+saveRDS(pums_2019_1yr, "a6_pums.rds") #save to disk so dont have to run the previous chunk ever again
+```
+
+```{r metadata-loading}
+pums_2019_1yr <-readRDS("a6_pums.rds")
+```
+
+```{r motify-data-for-sf}
+ca_pumas <-
+  pumas("CA", cb = T, progress_bar = F) #get CA puma data
+
+sf_boundary <-
+  counties("CA", cb = T, progress_bar = F) %>%
+  filter(NAME == "San Francisco") #get CA geographic info for mapping
+
+sf_pumas <-
+  ca_pumas %>% 
+  st_centroid() %>% 
+  .[sf_boundary, ] %>% 
+  st_drop_geometry() %>%
+  left_join(ca_pumas %>% select(GEOID10)) %>% 
+  st_as_sf() #create sf object for CA
+
+sf_pums <-
+  pums_2019_1yr %>% 
+  mutate(
+    PUMA = str_pad(public_use_microdata_area,5,"left","0")
+  ) %>% 
+  filter(PUMA %in% sf_pumas$PUMACE10)
+```
+
+We focus on the San Francisco area (Fig. \@ref(fig:map-sf-pumas-1)).
+
+```{r map-sf-pumas-1, fig.align='center',fig.cap="Map of studied area San Francisco"}
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = sf_pumas
+  ) %>%
+  addMarkers(
+    data = sf_pumas %>% 
+      st_centroid()
+  )
+```
+
+```{r map-sf-pumas-2, eval =F}
+ggplot(sf_pumas) + geom_sf()
+```
+
+```{r}
+sf_pums_clean <- sf_pums %>%
+  filter(YBL %in% c("1","2","3")) %>% #filtering the years needed
+  mutate(
+    YBL = as.numeric(YBL),
+    HINCP = as.numeric(HINCP),
+    AGEP = as.numeric(AGEP)
+         ) %>%
+  group_by(SERIALNO, .drop = FALSE) %>%
+  arrange(AGEP) %>% #order your df by AGEP
+  summarise_all(first) %>%
+  mutate(
+    LR = case_when(
+          AGEP < 6 & HINCP < 90000~1,
+          TRUE ~ 0
+    )
+  )
+```
+
+```{r factoring}
+sf_pums_clean <- sf_pums_clean %>% 
+  mutate(
+    BLD = as.factor(sf_pums_clean$BLD),
+    TEN = as.factor(sf_pums_clean$TEN),
+    MV = as.factor(sf_pums_clean$MV),
+    PUMA = as.factor(sf_pums_clean$PUMA)
+  )
+```
+
+A lead risk prediction model is built with factors building built year, type of housing, move-in date, and PUMA information to predict the lead risk of given household.
+
+Summary of the model can be found below:
+
+```{r}
+pums_model <- glm(LR ~BLD+TEN+MV+PUMA, family = quasibinomial(), sf_pums_clean)
+```
+
+```{r}
+summary(pums_model)
+```
+
+The coefficients of the model can be found in Table \@ref(tab:cof-table).
+
+```{r cof-table}
+cof2 <- summary(pums_model)$coefficients
+knitr::kable(cof2,
+             caption = "Cofficient Table",
+             digits = 2)
+```
+
+```{r predict}
+new_data = sample_n(sf_pums_clean, size = 1)
+```
+
+To test the model, we pick a random column from our dataset and feed it to our model. The predicted score of risk for the random data is `r predict(pums_model, new_data, type ="response")` , where its true value is `r new_data$LR` .
+
+Now we feed our entire dataset into the model to check its Type1/Type2 errors (Table \@ref(tab:error-table)).
+
+```{r}
+sf_pums_clean <- sf_pums_clean %>%
+  cbind(
+    SCORE = predict(pums_model,sf_pums_clean, type = "response")
+  )
+```
+
+```{r}
+summary_2x2 <-
+  sf_pums_clean %>% 
+  mutate(
+    LR = ifelse(
+      LR == 1, 
+      "Yes (Risk)", 
+      "No (No Risk)"
+    )
+  ) %>% 
+  pull(LR) %>% 
+  table(sf_pums_clean$SCORE >= 0.1)
+```
+
+```{r error-table}
+knitr::kable(summary_2x2,
+             caption = "Type1/2 Table")
+```
+
+The households exceeding my threshold score are typically built in 1939 or earlier, living in one-family house (detached), occupied without payment of rent, and have been living in the house for 5-9 years.
+
+The success rate is relatively low. Roughly 31 sets of postcards (not considering WGTP) will be mailed out based on the specified threshold. Only 13% of the postcards actually go to low-income households with children, and 11% of children at risk are likely to be reached.
+
+To improve the strategy, we can lower the threshold value to improve type1 error in the expense of type2 error (which is relatively harmless).
+
+```{r}
+temp <- tempfile()
+download.file("https://www2.census.gov/programs-surveys/acs/data/pums/2019/1-Year/csv_hca.zip",destfile = temp)
+
+pums_hca_2019_1yr <- read_csv(unzip(temp,"psam_h06.csv"))
+
+unlink(temp)
+```
+
+
+```{r}
+test <- pums_hca_2019_1yr %>%
+  group_by(SERIALNO) %>%
+  select(starts_with("WGTP"))
+
+sf_pums_clean <- sf_pums_clean %>%
+  left_join(., test, by = "SERIALNO")
+```
+
+```{r}
+model2 <- glm(LR ~BLD+TEN+MV+PUMA, family = quasibinomial(), sf_pums_clean)
+```
+
+```{r}
+summary_rw <-
+  sf_pums_clean %>% 
+  select(LR, SCORE, starts_with("WGTP"), -WGTP.x, -WGTP.y) %>%
+  group_by(LR, SC=SCORE>0.1) %>%
+  summarise_all(sum)
+```
+

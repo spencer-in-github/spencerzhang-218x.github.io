@@ -155,7 +155,7 @@ tp_by_residence %>%
 What would be the underlying issue that hinders the Bay Area population's enthusiasm to take the public transportation? What factors influence worker's choice of commute transportation? Does people of different working conditions, socioeconomic status, and identities make different choices when it comes to transportation? Further analysis and personal interpretation is presented below for reader's reference.
 
 ### Possible influencing factor inspection
-
+The population show different preferences to different transportation means when they reside inside or outside the county of their workplace, outlined in Figure 2. What is interesting about this figure is that among people taking public transportation, there are more people who live far from the place of work. There might be other confounding factors such as income. One hypothesis is that people with lower income tend to reside in places with lower rent, where might be far from their working location; thus they tend to watch their daily expenses more and may likely not have a car.
 ```{r tp-by-work-residence-plot, fig.cap= "Fig. 2 The Bay Area worker commute means by work/home location"}
 tp_by_residence %>%
   ggplot() +
@@ -238,8 +238,8 @@ tp_by_race <-
   })
 write_rds(tp_by_race, "tp_by_race.rds")
 ```
-
-```{r tp-by-race-plot}
+The population percentage driving alone to work doesn't vary significantly among different races in the Bay Area, as outlined in Figure 3, however the percentage of population taking public transportation is significantly higher in African American and Asian population. This still may be correlated with income status.
+```{r tp-by-race-plot, fig.cap="Fig. 3 The Bay Area worker commute transportation choice by race"}
 tp_by_race <- readRDS("tp_by_race.rds")
 tp_by_race %>%
   ggplot() +
@@ -299,8 +299,8 @@ tp_by_income <-
   summarise(estimate = sum(estimate))
 saveRDS(tp_by_income,"tp_by_income.rds")
 ```
-
-```{r tp-by-income-plot}
+The commute choice of population by income sectors is outlined in Figure 4. Surprisingly the choice preferences for driving alone and public transportation both show a bipolar trend, with the former one having the middle income population's preference and the latter one being favored by low income as well as extremely high income.
+```{r tp-by-income-plot, fig.cap="Fig. 4 The Bay Area worker commute transportation choice by income"}
 tp_by_income <- readRDS("tp_by_income.rds")
 tp_by_income %>%
   ggplot() +
@@ -361,7 +361,7 @@ tp_by_industry <-
 saveRDS(tp_by_industry,"tp_by_industry.rds")
 ```
 
-```{r tp-by-industry-plot}
+```{r tp-by-industry-plot, fig.cap="Fig. 5 The Bay Area worker commute transportation choice by industry"}
 tp_by_industry = readRDS("tp_by_industry.rds")
 tp_by_industry %>%
   ggplot() +

@@ -1,0 +1,391 @@
+---
+title: "Transportation analysis in the Bay Area"
+author: "Spencer Zhang"
+date: "12/4/2021"
+output:
+  rmdcss::html_modest
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning = F, message = F, fig.align = 'center')
+```
+
+```{r library}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(leaflet)
+library(censusapi)
+```
+
+```{r system}
+rm(list = ls())
+setwd("/Users/spencerzhang/GitHub/spencerzhang-218x.github.io")
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r acs-data-downloading, eval = F}
+acs_vars_2019_5yr <-
+  listCensusMetadata(
+    name = "2019/acs/acs5",
+    type = "variables"
+  )
+saveRDS(acs_vars_2019_5yr, "acs_vars_2019_5yr.rds")
+```
+
+```{r acs-data-loading}
+acs_vars_2019_5yr <- readRDS("acs_vars_2019_5yr.rds")
+```
+
+```{r tp-total-data}
+bay_means <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = "group(B08105A)"
+  ) %>%
+  select(!c(GEO_ID,state,NAME) & !ends_with(c("EA","MA","M"))) %>%
+  pivot_longer(
+    ends_with("E"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    acs_vars_2019_5yr %>%
+      select(name, label),
+    by = c("name" = "name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    label,
+    into = c(NA, NA, "means"),
+    sep = "!!"
+  ) %>%
+  pivot_wider(
+    means,
+    names_from = county,
+    values_from = estimate
+  ) %>%
+  filter(!is.na(means)) %>%
+  mutate(
+    total = rowSums(.[,2:10])
+  ) %>%
+  select(means, total)
+
+saveRDS(bay_means, "bay_tp_means.rds")
+```
+### Introduction & Background
+In this mini project, we want to get some preliminary insights into the transportation accessibility and commute behavior in the Bay Area, with a specific focus on public transportation.
+
+First, we take a general overlook into the commute means makeup among the Bay Area workers. As shown in the figure below, more than half of the Bay Area workers drive alone to work, a transportation habit that accounts for major greenhouse emissions. Only less than a quarter of the worker population take public transportation to work.
+```{r bay-means-plot, fig.cap="Fig.1 The Bay Area worker commute means composition", fig.align='center'}
+bay_means = readRDS("bay_tp_means.rds")
+ggplot(bay_means) +
+  geom_bar(aes(x="", y=total, fill = means), stat = "identity") +
+  coord_polar("y", start=0) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank()) + 
+  labs(x = "", y = "The Worker Population in the Bay Area",
+       fill = "Means of Commute",
+       title = "The Bay Area worker commute means composition")
+```
+
+```{r residence-data, eval=F}
+tp_by_residence <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = "group(B08130)"
+  ) %>%
+  select(!c(GEO_ID,state,NAME) & !ends_with(c("EA","MA","M"))) %>%
+  pivot_longer(
+    ends_with("E"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    acs_vars_2019_5yr %>%
+      select(name, label),
+    by = c("name" = "name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    label,
+    into = c(NA, NA, "means", "level1", "level2"),
+    sep = "!!"
+  ) %>%
+  select(-county) %>%
+  filter(!is.na(level1)) %>%
+  mutate(
+    residence = coalesce(level2, level1)
+  ) %>%
+  select(-level1, -level2) %>%
+  filter(residence != "Worked in state of residence:" & means != "Worked in state of residence:") %>%
+  group_by(means, residence) %>%
+  summarise(estimate = sum(estimate))
+saveRDS(tp_by_residence,"tp_by_residence.rds")
+```
+It is intuitively plausible that the distance between one's place of work and residence would in some way affect choices of commute. The work/home location situation in the Bay Area is outlined in Figure 2. Nearly 2/3 of the worker population reside in the same county of their work place. With the great number of people living relatively adjacent to their work place, one would expect a higher preference to the public transportation system since it's easier to access and time-efficient within one single county area, however the statistics here show the opposite. 
+```{r work-residence-pie}
+tp_by_residence = readRDS("tp_by_residence.rds")
+tp_by_residence %>%
+  group_by(residence) %>%
+  summarise(estimate = sum(estimate)) %>%
+  ggplot() +
+  geom_bar(
+      aes(x="", y=estimate, fill = residence),
+      stat = "identity"
+  ) + 
+  coord_polar("y", start=0) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank()) +
+  labs(x = "",
+       y = "Bay Area Population",
+       title = "Bay Area Worker Composition by Work Place",
+       fill = "Place of residence")
+```
+What would be the underlying issue that hinders the Bay Area population's enthusiasm to take the public transportation? What factors influence worker's choice of commute transportation? Does people of different working conditions, socioeconomic status, and identities make different choices when it comes to transportation? Further analysis and personal interpretation is presented below for reader's reference.
+
+### Possible influencing factor inspection
+
+```{r tp-by-work-residence-plot, fig.cap= "Fig. 2 The Bay Area worker commute means by work/home location"}
+tp_by_residence %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = means %>% factor(levels = rev(unique(tp_by_residence$means))),
+      y = estimate,
+      fill = residence %>% factor(levels = rev(unique(tp_by_residence$residence)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) +
+  labs(
+    x = "Means of transportation",
+    y = "Number of population",
+    title = "The Bay Area means of transportation by industry",
+    fill = "Work/Residence situation"
+  ) +
+  coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) +
+  guides(fill = guide_legend(reverse = T))
+```
+
+#### means of transportation by race
+```{r race-cate-define}
+#A-G
+census_race_categories <- 
+  c(
+    "White Alone",
+    "Black or African American",
+    "American Indian and Alaska Native Alone",
+    "Asian Alone",
+    "Native Hawaiian and Other Pacific Islander Alone",
+    "Some Other Race Alone",
+    "Two or More Races"
+  )
+```
+```{r tp-race-data, eval = F}
+tp_by_race <-
+  1:7 %>%
+  map_dfr(function(x){
+    getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = paste0("group(B08105", LETTERS[x], ")")
+  ) %>%
+  select(!c(GEO_ID,state,NAME) & !ends_with(c("EA","MA","M"))) %>%
+  pivot_longer(
+    ends_with("E"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    acs_vars_2019_5yr %>%
+      select(name, label),
+    by = c("name" = "name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    label,
+    into = c(NA, NA, "means"),
+    sep = "!!"
+  ) %>%
+  pivot_wider(
+    means,
+    names_from = county,
+    values_from = estimate
+  ) %>%
+  filter(!is.na(means)) %>%
+  mutate(
+    race = census_race_categories[x],
+    total = rowSums(.[,2:10])
+  ) %>%
+  select(means, total, race)
+  })
+write_rds(tp_by_race, "tp_by_race.rds")
+```
+
+```{r tp-by-race-plot}
+tp_by_race <- readRDS("tp_by_race.rds")
+tp_by_race %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = race %>% factor(levels = rev(unique(tp_by_race$race))),
+      y = total,
+      fill = means %>% factor(levels = rev(unique(tp_by_race$means)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) +
+  labs(
+    x = "Race of population",
+    y = "Number of population",
+    title = "Bay Area means of transportation by race",
+    fill = "Means of transportation"
+  ) +
+  coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) +
+  guides(fill = guide_legend(reverse = T))
+```
+
+#### means of transportation by income
+```{r tp-income-data, eval = F}
+tp_by_income <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = "group(B08119)"
+  ) %>%
+  select(!c(GEO_ID,state,NAME) & !ends_with(c("EA","MA","M")) &!starts_with("B08119_00")) %>%
+  pivot_longer(
+    ends_with("E"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    acs_vars_2019_5yr %>%
+      select(name, label),
+    by = c("name" = "name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    label,
+    into = c(NA, NA, "means", "income"),
+    sep = "!!"
+  ) %>%
+  select(-county) %>%
+  filter(!is.na(income)) %>%
+  group_by(means, income) %>%
+  summarise(estimate = sum(estimate))
+saveRDS(tp_by_income,"tp_by_income.rds")
+```
+
+```{r tp-by-income-plot}
+tp_by_income <- readRDS("tp_by_income.rds")
+tp_by_income %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = income %>% factor(levels = rev(unique(tp_by_income$income))),
+      y = estimate,
+      fill = means %>% factor(levels = rev(unique(tp_by_income$means)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) +
+  labs(
+    x = "Income",
+    y = "Number of population",
+    title = "Bay Area means of transportation by income",
+    fill = "Means of transportation"
+  ) +
+  coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) +
+  guides(fill = guide_legend(reverse = T))
+```
+
+#### means of transportation by industry
+```{r tp-by-industry-data,eval=F}
+tp_by_industry <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "county:001,013,041,055,075,081,085,095,097",
+    regionin = "state:06",
+    vars = "group(B08124)"
+  ) %>%
+  select(!c(GEO_ID,state,NAME) & !ends_with(c("EA","MA","M"))) %>%
+  pivot_longer(
+    ends_with("E"),
+    names_to = "name",
+    values_to = "estimate"
+  ) %>%
+  left_join(
+    acs_vars_2019_5yr %>%
+      select(name, label),
+    by = c("name" = "name")
+  ) %>%
+  select(-name) %>%
+  separate(
+    label,
+    into = c(NA, NA, "means", "industry"),
+    sep = "!!"
+  ) %>%
+  select(-county) %>%
+  filter(!is.na(industry)) %>%
+  group_by(means, industry) %>%
+  summarise(estimate = sum(estimate))
+saveRDS(tp_by_industry,"tp_by_industry.rds")
+```
+
+```{r tp-by-industry-plot}
+tp_by_industry = readRDS("tp_by_industry.rds")
+tp_by_industry %>%
+  ggplot() +
+  geom_bar(
+    aes(
+      x = means %>% factor(levels = rev(unique(tp_by_industry$means))),
+      y = estimate,
+      fill = industry %>% factor(levels = rev(unique(tp_by_industry$industry)))
+    ),
+    stat = "identity",
+    position = "fill"
+  ) +
+  labs(
+    x = "Means of transportation",
+    y = "Number of population",
+    title = "Bay Area means of transportation by industry",
+    fill = "Industry"
+  ) +
+  coord_flip() +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "vertical"
+  ) +
+  guides(fill = guide_legend(reverse = T))
+```
+
+

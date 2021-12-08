@@ -1,0 +1,88 @@
+---
+title: "w10-notes-spatial subsetting"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+# spatial subsetting
+
+```{r}
+library(tidyverse)
+library(sf)
+library(mapview)
+library(tigris)
+library(censusapi)
+```
+
+```{r point-defining}
+point <-
+  c(-122.16642, 37.3839) %>% #can use GoogleMap to pinpoint points
+  st_point () %>%
+  st_sfc() %>%
+  st_set_crs(4326) #note what coordinate systems you are using
+```
+
+```{r}
+mapview(point)
+
+buffer <- st_buffer(point, 1) #st buffer computes a buffer around this geometry/each geometry.
+mapview(buffer)
+
+buffer <- point %>%
+  st_transform(26910) %>% #different coordinate systems
+  st_buffer(1600)
+
+buffer <- st_buffer(point, 1600)
+mapview(buffer)
+```
+
+## subseting method 1: buffer
+```{r}
+smc_tracts <- tracts("CA", "San Mateo")
+mapview(smc_tracts) + mapview(buffer)
+
+subset_tracts <- smc_tracts %>%
+  st_transform(st_crs(buffer)) %>% #transform your crs to match
+  .[buffer,] #using buffer to subset your spatial data; note your buffer and original spatial dataset should be using the same crs 
+
+# or temporarily transform it
+  .[buffer %>% st_transform(st_crs(smc_tracts))]
+
+```
+
+## subsetting method 2: centroids
+```{r}
+subset_tracts_center <- smc_tracts %>%
+  st_centroid() %>%
+  st_transform(26910) %>%
+  .[buffer,]
+
+mapview(subset_tracts_center) + mapview(buffer)
+```
+
+## subsetting method 3: intersection
+most precise
+```{r}
+subset_tracts_intersect <- smc_tracts %>%
+  st_transform(26910) %>%
+  st_intersection(buffer,.) %>%
+  st_as_sf() #momentarily drop your spatial features
+```   
+
+```{r}
+polygon <- rbind(
+  c(-122.16642, 37.3839),
+  c(-122.2115, 37.4134),
+  c(-122.1901, 37.4314),
+  c(-122.15406, 37.4099), #four corners of your polygon
+  c(-122.16642, 37.3839) #closed loop, go back to your first point
+) %>%
+  list() %>% 
+  st_polygon() %>% #creating your polygon with the points defined above
+  st_sfc() %>%
+  st_set_crs(4326)
+
+mapview(polygon)
+```
+

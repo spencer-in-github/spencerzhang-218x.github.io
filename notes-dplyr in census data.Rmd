@@ -1,0 +1,111 @@
+---
+title: "notes-"
+output: html_notebook
+---
+
+```{r}
+library(readxl)
+
+temp <- tempfile()
+download.file("https://oehha.ca.gov/media/downloads/calenviroscreen/document/calenviroscreen40resultsdatadictionaryf2021.zip",destfile = temp)
+
+ces4 <- read_excel(
+  unzip(
+    temp, 
+    "calenviroscreen40resultsdatadictionary_F_2021.xlsx"
+  ), 
+  sheet = "CES4.0FINAL_results"
+)
+
+unlink(temp)
+
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+ca_tracts <- tracts("CA", cb = T, progress_bar = F)
+
+ces4_bay_pm25 <-
+  ces4 %>% 
+  filter(`California County` %in% bay_county_names) %>% 
+  dplyr::select(`Census Tract`, PM2.5, `Total Population`) %>% 
+  left_join(
+    ca_tracts %>% 
+      transmute(GEOID = as.numeric(GEOID)), 
+    by = c("Census Tract" = "GEOID")
+  ) %>% 
+  st_as_sf()
+```
+
+```{r}
+Sys.setenv(CENSUS_KEY="c8aa67e4086b4b5ce3a8717f59faa9a28f611dab")
+```
+
+```{r}
+smc_population <-
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "tract:*", 
+    regionin = "state:06+county:081",
+    vars = "B01001_001E"
+  ) %>% 
+  mutate(
+    tract = paste0(state, county, tract) %>% as.numeric()
+  )
+```
+
+```{r}
+ces4_pop <- ces4_bay_pm25 %>%
+  left_join(
+    smc_population %>%
+      dplyr::select(
+        'Census Tract' = tract,
+        pop = B01001_001E
+      )
+  )
+
+mapview(ces4_pop, zcol = "pop")
+```
+
+```{r}
+smc_tracts <- ca_tracts %>% 
+  filter(COUNTYFP == "081")
+
+places <- places("CA")
+
+places_example <- places %>% 
+  filter(NAME %in% c("East Palo Alto", "Menlo Park"))
+```
+
+```{r}
+smc_tracts_places_join <- smc_tracts %>% 
+  st_join(places_example)
+```
+
+```{r}
+join <- places_example %>%
+  st_join(smc_tracts)
+
+mapview(smc_tracts_places_join)
+
+smc_tracts_places_join %>%
+  filter(!is.na(NAME.y)) %>%
+  mapview() + mapview(places_example) #note there are duplicates of layers of tracts
+```
+
+```{r}
+deduplicate <- 
+  join %>%
+  filter(!duplicated(.))
+```
+

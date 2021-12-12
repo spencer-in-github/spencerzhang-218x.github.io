@@ -1,0 +1,293 @@
+﻿X,Y,OBJECTID,LOCATION,STATION,CODE,ADDRESS,ZIP,PASS_OP,PASS_NETWO,COMM_OP,COMM_NETWO,BUS_ROUTES,TRANSIT,AIRPORT,STATION_TY,INTERMODAL,DIST,CO
+-13569099.945,4383544.0745,1,Parking Garage,MONTEREY - Parking Garage,-,"Tyler, between Del Monte & Franklin",93940, , , , ,55, , ,2,0,5,MON
+-13178381.9294,4016068.4913,2,El Segundo,EL SEGUNDO,ESG,700 South Douglas Street,90245, , , , ,1c, , ,2,0,7,LA
+-13542075.1672,4457195.7854,3,Morgan Hill,MORGAN HILL,MHC,17200 Depot Street,95037, , ,PCJPB,Caltrain,55, , ,3,1,4,SCL
+-13603041.0092,4544523.9613,4,Amtrak Station,OAKLAND COLISEUM,OAC,700 Seventy-third Avenue,94621,Amtrak,Capitol Corridor, , , ,"AC Transit,BART",AirBART connector to OAK,6,1,4,ALA
+-13324118.7815,4084568.9858,5,Amtrak Station,SANTA BARBARA,SBA,209 State Street,93101,Amtrak,"Coast Starlight,Pacific Surfliner", , ,"4,10,17,21",Santa Barbara MTD, ,5,1,5,SB
+-13563554.067,4386158.5431,6,Edge Water Transit Exchange,SEASIDE,SES,Playa Avenue and California Avenue,93955, , , , ,55, , ,2,0,5,MON
+-13167605.9463,4007780.5912,7,Alpine Village,TORRANCE,TOA,20575 Hamilton Avenue,90502, , , , ,1c, , ,2,0,7,LA
+-13517913.951,4536623.6031,8,Tracy - ACE,TRACY,TRC,4800 Tracy Boulevard,95377, , ,SJRRC,ACE,6, , ,3,1,10,SJ
+-13185685.817,4038037.643,9,UCLA,"LOS ANGELES, UCLA",WES,592 Gayley Avenue,90024, , , , ,1c, , ,2,0,7,LA
+-13310963.7356,4543702.3824,10,Yosemite - Ahwahnee,YOSEMITE,YOA,1 Ahwahnee Drive,95389, , , , ,15, , ,2,0,10,MPA
+-13312758.964,4543703.6516,11,Yosemite - Curry Village,YOSEMITE,YOC,9010 Village Drive,95389, , , , ,15, , ,2,0,10,MPA
+-13570122.8139,4485233.863,12,Amtrak/Caltrain Station,SAN JOSE,SJC,65 Cahill St.,95110,Amtrak,"Capitol Corridor,Coast Starlight","PCJPB,SJRRC","ACE,Caltrain","6,17,21,35,55","VTA,Highway 17 Express", ,5,1,4,SCL
+-13577352.1947,4496038.0327,13,Amtrak Station,SANTA CLARA/GREAT AMERICA,GAC,Stars & Stripes Dr at Tasman Dr O'pass,95054,Amtrak,Capitol Corridor,SJRRC,ACE,6,VTA, ,5,1,4,SCL
+-13583767.7936,4434980.0008,14,Metro Center,SANTA CRUZ,SCZ,920 Pacific Ave.,95060, , , , ,35, , ,2,0,5,SCR
+-13584111.2907,4445932.0124,15,Cavallaro Transit Center,SCOTTS VALLEY,SVY,246 Kings Village Blvd.,95066, , , , ,35, , ,2,0,5,SCR
+-13624613.1829,4951012.3414,16,Downtown Transit Center,REDDING,RDR,1530 Yuba St.,96001, , , , ,3, , ,2,0,2,SHA
+-13624714.5394,4950980.0123,17,Amtrak Station,REDDING,RDD,1620 Yuba St.,96001,Amtrak,Coast Starlight, , , , , ,1,0,2,SHA
+-13611096.6939,5043729.1394,18,Amtrak Station,DUNSMUIR,DUN,5750 Sacramento Ave.,96025,Amtrak,Coast Starlight, , , , , ,1,0,2,SIS
+-13585500.5469,4613875.6464,19,Amtrak Station,SUISUN/FAIRFIELD,SUI,177 Main St. (Under Highway 12),94585,Amtrak,Capitol Corridor, , , ,"Fairfield/Suisun Transit,Rio Vista Delta Breeze", ,4,1,4,SOL
+-13609494.9455,4598273.4858,20,Denny's Restaurant,VALLEJO,VAL,4355 Sonoma Blvd.,94589, , , , ,7, , ,2,0,4,SOL
+-13606767.9519,4599232.6126,21,Main Gate,DISCOVERY KINGDOM,VMW,Fairgrounds Ave. at Marine World Pkwy.,94589, , , , ,7, , ,2,0,4,SOL
+-13677772.47,4665576.3816,22,Singeltree Inn Restaurant,HEALDSBURG,HEA,165 Healdsburg Ave.,95448, , , , ,7, , ,2,0,4,SON
+-13651271.8493,4613810.2517,23,City Library,PETALUMA,PTC,100 Fairgrounds Dr. (nr Washington),94952, , , , ,7, , ,2,0,4,SON
+-13659953.2523,4628603.1412,24,Across from Safeway,ROHNERT PARK,RPC,6336 Commerce Blvd.,94928, , , , ,7, , ,2,0,4,SON
+-13661174.145,4641170.5115,25,Courtyard by Marriott,SANTA ROSA,SRC,175 Railroad St.,95401, , , , ,7, , ,2,0,4,SON
+-13693536.8893,4692988.2283,26,Transit Depot,CLOVERDALE,CLV,Citrus Fair Dr. at Asti Road,95425, , , , ,7, , ,2,0,4,SON
+-13460013.5399,4532520.5017,27,Amtrak Station,MODESTO,MOD,Held Dr. & Briggsmore Ave.,95355,Amtrak,San Joaquin, , , ,Modesto Area Express, ,4,1,10,STA
+-13447113.4267,4512866.0945,28,Amtrak Station,TURLOCK/DENAIR,TRK,Sante Fe Ave. at Elm St. (Denair),95316,Amtrak,San Joaquin, , , , , ,1,0,10,STA
+-13606687.6697,4891070.0763,29,Taco Bell,RED BLUFF,RBF,228 Main St.,96080, , , , ,3, , ,2,0,2,TEH
+-13279236.1066,4346404.9393,30,Transit Center,VISALIA,VIS,425 East Oak St.,93291, , , , ,18b, , ,2,0,8,TUL
+-13293921.659,4347743.2948,31,Bus Depot,GOSHEN JCT.,GSN,30435 Road 68,93227, , , , ,18b, , ,2,0,8,TUL
+-13238649.6462,4082001.9487,32,Intl House of Pancakes,FILLMORE,FIL,718 Ventura St. (Hwy 126 at Hwy 23),93015, , , , ,10, , ,2,0,7,VEN
+-13266625.1919,4055610.2629,33,Transportation Center,OXNARD,OXN,201 E. 4th St.,93030,Amtrak,"Coast Starlight,Pacific Surfliner",Metrolink,Ventura County Line,"4,10",Gold Coast Transit, ,5,1,7,VEN
+-13254887.5909,4075735.6598,34,Carrow's Restaurant,SANTA PAULA,SAP,245 South Palm Ave. at Hwy 126,93060, , , , ,10, , ,2,0,7,VEN
+-13213129.1138,4065157.3163,35,Amtrak/Metrolink Station,SIMI VALLEY,SIM,5000 Los Angeles Ave. near Stearns,93063,Amtrak,"Coast Starlight,Pacific Surfliner",Metrolink,Ventura County Line,"1,4",Simi Valley Transit, ,5,1,7,VEN
+-13280162.4447,4066042.733,36,Amtrak Station,VENTURA,VEC,Harbor & Figueroa (County Fairgrnds),93003,Amtrak,Pacific Surfliner, , ,"4,10",Gold Coast Transit, ,5,1,7,VEN
+-13250740.7598,4058007.0046,37,Amtrak/Metrolink Station,CAMARILLO,CML,30 Lewis Rd.,93010,Amtrak,Pacific Surfliner,Metrolink,Ventura County Line,4, , ,3,1,7,VEN
+-13233417.8576,4067115.3126,38,Amtrak/Metrolink Station,MOORPARK,MPK,High St. at Moorpark Ave.,93021,Amtrak,Pacific Surfliner,Metrolink,Ventura County Line,4,Moorpark City Transit, ,5,1,7,VEN
+-13551876.0884,4656522.9695,39,Amtrak Station,DAVIS,DAV,840 2nd St.,95616,Amtrak,"California Zephyr,Capitol Corridor,Coast Starlight", , ,3,"Yolobus,Davis Unitrans", ,5,1,3,YOL
+-13536154.1263,4742284.7884,40,Yuba County Govt Center,MARYSVILLE,MRV,I Street btwn 8th & 9th,95901, , , , ,3, , ,2,0,3,YUB
+-13027390.0629,4150860.102,41,Amtrak/Harvey House,BARSTOW,BAR,685 N. 1st Ave.,92311,Amtrak,Southwest Chief, , ,9, , ,3,1,8,SBD
+-13057227.2278,4101286.0235,42,Victor Valley Trans. Center,VICTORVILLE,VRV,16838 D St.,92392,Amtrak,Southwest Chief, , , , , ,1,0,8,SBD
+-13624672.2171,4550334.7188,43,Ferry Building,SAN FRANCISCO,SFC,"Ag Bldg, 101 The Embarcadero, Ste 118",94111, , , , ,"17,34,99", , ,2,0,4,SF
+-13518127.2956,4545773.9197,44,Wendy's Restaurant,TRACY,TRA,725 W. Clover Rd. at Tracy Blvd.,95376, , , , ,6, , ,2,0,10,SJ
+-13431373.3726,4204606.3616,45,Cal-Poly,SAN LUIS OBISPO,SLP,Vista Grande Rest. on Grand Ave.,93407, , , , ,"17,18a,21", , ,2,0,5,SLO
+-13340802.5824,4087698.9379,46,Amtrak Station,GOLETA,GTA,North End of South Patera Lane,93117,Amtrak,Pacific Surfliner, , ,4, , ,3,1,5,SB
+-13614471.1284,4560713.3184,47,Amtrak Station,BERKELEY,BKY,University Ave. & 3rd St.,94710,Amtrak,Capitol Corridor, , , ,AC Transit, ,4,1,4,ALA
+-13581796.5715,4517299.0664,48,Amtrak Station,FREMONT/CENTERVILLE,FMT,37260 Fremont Blvd. at Peralta Blvd.,94536,Amtrak,Capitol Corridor,SJRRC,ACE,6,AC Transit, ,5,1,4,ALA
+-13555096.0481,4535023.1217,49,LAVTA Transit Center,LIVERMORE,LIV,2500 Railroad Ave. (near 1st St.),94550, , ,SJRRC,ACE,"6,34", , ,3,1,4,ALA
+-13611198.9339,4550387.0879,50,Amtrak Station,OAKLAND,OKJ,245 2nd St.,94607,Amtrak,"Capitol Corridor,Coast Starlight,San Joaquin", , ,"17,34,99",AC Transit, ,5,1,4,ALA
+-13591963.4615,4532442.03,51,Amtrak Station,HAYWARD,HAY,"22555 Meekland Ave. at ""A"" St.",94545,Amtrak,Capitol Corridor, , , ,AC Transit, ,4,1,4,ALA
+-13613423.3822,4556921.7962,52,Amtrak Station,EMERYVILLE,EMY,5885 Horton St.,94608,Amtrak,"California Zephyr,Capitol Corridor,Coast Starlight,San Joaquin", , ,"34,99","AC Transit,Emery-Go-Round", ,5,1,4,ALA
+-13569677.8904,4537480.0748,53,BART Station,DUBLIN/PLEASANTON,DBP,I-580 at Hopyard (Mid-Day Parking),94588, , ,BART,BART,"6,34", , ,3,1,4,ALA
+-13572497.8988,4514582.1809,54,Across Mission Blvd. from Caltrans Park-n-Ride Lot,FREMONT/MISSION SAN JOSE,FRT,Upper Mission Blvd (Hwy 238) at I-680,94538, , , , ,6, , ,2,0,4,ALA
+-13563774.4513,4825805.9819,55,Amtrak Station,CHICO,CIC,W. 5th & Orange St.,95926,Amtrak,Coast Starlight, , ,3, , ,3,1,3,BUT
+-13533340.3355,4796442.8734,56,Park & Ride Lot,OROVILLE,ORV,Highway 70 at Grand Ave.,95965, , , , ,3, , ,2,0,3,BUT
+-13596400.9,4581959.7568,57,Amtrak Station,MARTINEZ,MTZ,601 Marina Vista Dr.,94553,Amtrak,"California Zephyr,Capitol Corridor,Coast Starlight,San Joaquin", , ,7,Contra Costa County Connection, ,5,1,4,CC
+-13620318.2807,4570439.9578,58,Amtrak/BART Station,RICHMOND,RIC,16th & MacDonald Ave.,94802,Amtrak,"Capitol Corridor,San Joaquin", , , ,"AC Transit,BART,Golden Gate Transit",BART to San Francisco International (SFO),6,1,4,CC
+-13560481.3772,4581941.7144,59,Amtrak Station,ANTIOCH,ACA,"Foot of ""I"" Street",94509,Amtrak,San Joaquin, , , ,Tri-Delta Transit, ,4,1,4,CC
+-13446162.5078,4683530.9149,60,Placerville Station,PLACERVILLE,PCV,Mosquito Road at Clay St.,95667, , , , ,20c, , ,2,0,3,ED
+-13351917.541,4715820.2461,61,Transit Center,"STATELINE, NV",SLH,4114 Lake Tahoe Blvd (South Lake Tahoe),89449, , , , ,20c, , ,2,0,3,ED
+-13358840.2501,4709232.6017,62,South Y Transit Station,SOUTH LAKE TAHOE,SLT,1000 Lake Tahoe Blvd. at  Emerald Bay Rd.,96151, , , , ,20c, , ,2,0,3,ED
+-13334224.1989,4402740.8297,63,Amtrak Station,FRESNO,FNO,"2650 Tulare St., Bldg. B",93721,Amtrak,San Joaquin, , ,1,Fresno Area Express, ,5,1,6,FRE
+-13812907.458,4992997.7823,64,Transit Plaza,ARCATA,ARC,925 E St. (between 9th & 10th),95521, , , , ,7, , ,2,0,1,HUM
+-13821345.9345,4983301.0217,65,Stantons Coffee Shop,EUREKA,EKA,5th & L Streets,95501, , , , ,7, , ,2,0,1,HUM
+-13819942.2306,4951245.3269,66,Pepper's Restaurant,FORTUNA,FTA,719 South Fortuna Blvd.,95540, , , , ,7, , ,2,0,1,HUM
+-13814889.5058,4936624.442,67,Scotia Inn,SCOTIA/RIO DELL,RDS,"Main & Mill St., Scotia",95565, , , , ,7, , ,2,0,1,HUM
+-13780804.5379,4880140.7399,68,Waterwheel Restaurant,GARBERVILLE,GBV,924 Redwood Drive,95440, , , , ,7, , ,2,0,1,HUM
+-13815462.0455,5007976.0176,69,Arcata Airport Terminal,McKINLEYVILLE,MKV,Bus Zone in Front of Lobby,95521, , , , ,7, , ,2,0,1,HUM
+-13247948.5529,4214722.3681,70,Amtrak Station,BAKERSFIELD,BFD,601 Truxton Ave.,93301,Amtrak,San Joaquin, , ,"1,9,10,12,19",Golden Empire Transit, ,5,1,6,KER
+-13155024.5661,4171001.37,71,Carls Jr. Restaurant,MOJAVE,MOJ,15900 Sierra Highway,93501, , , , ,"9,12", , ,2,0,6,KER
+-13284028.0557,4244921.3493,72,Amtrak Station,WASCO,WAC,700 G St.,93280,Amtrak,San Joaquin, , , ,City of Wasco Dial-A-Ride, ,4,1,6,KER
+-13186591.6499,4181875.2812,73,Burger King,TEHACHAPI,TEH,Mulberry St. at Tehachapi Blvd.,93561, , , , ,"9,12", , ,2,0,6,KER
+-13309058.0903,4314119.7882,74,Amtrak Station,CORCORAN,COC,Whitely & Otis Ave.,93212,Amtrak,San Joaquin, , , ,"Kings Area Rural Transit,Corcoran Area Transit", ,4,1,6,KIN
+-13319548.199,4345531.3845,75,Amtrak Station,HANFORD,HNF,200 Santa Fe Ave. #A,93230,Amtrak,San Joaquin, , ,"18a,18b",Kings Area Rural Transit, ,5,1,6,KIN
+-13334425.9446,4342378.5254,76,Chamber of Commerce,LEMOORE,LMC,300 E St.,93245, , , , ,18a, , ,2,0,6,KIN
+-13353950.2979,4298997.0599,77,Carls Jr. Restaurant,KETTLEMAN CITY,KTC,Highway 41 at I-5,93239, , , , ,18a, , ,2,0,6,KIN
+-13347761.5187,4335838.0605,78,Naval Air Station,LEMOORE (N),LMN,"Main Gate, Hwy 198 at 25th Ave.",93245, , , , ,18a, , ,2,0,6,KIN
+-13174943.1971,4054705.0616,79,Amtrak Station,BURBANK - Bob Hope Airport,BUR,3750 Empire Ave.,91505,Amtrak,Pacific Surfliner,Metrolink,"Burbank-Bob Hope Airport,Ventura County Line","1c,4",Burbank Bus,Bob Hope Burbank Airport,8,1,7,LA
+-13104135.1821,4041412.5925,80,Metrolink Station,CLAREMONT,CLM,200 West 1st St.,91711, , ,Metrolink,San Bernardino Line,19, , ,3,1,7,LA
+-13134831.0853,4098987.087,81,Come & Save Grocery,LITTLEROCK,LTR,7715 Pearblossom Hwy (Hwy 138),93543, , , , ,12, , ,2,0,7,LA
+-13156798.0526,3998517.0863,82,Denny's Restaurant,LONG BEACH,LBC,601 N. Long Beach Blvd.,90802, , , , ,1b, , ,2,0,7,LA
+-13156935.4279,3995555.0705,83,Queen Mary,LONG BEACH,LBQ,1126 Queens Highway,90802, , , , ,1b, , ,2,0,7,LA
+-13162129.8998,4036369.888,84,Union Station,LOS ANGELES,LAX,800 N. Alameda St.,90012,Amtrak,"Coast Starlight,Pacific Surfliner,Southwest Chief,Sunset Limited,Texas Eagle",Metrolink,"91 Line,Antelope Valley Line,Burbank-Bob Hope Airport,Orange County Line,Riverside Line,San Bernardino Line,Ventura County Line","1,4","LAMTA Metro and buses,LADOT Transit-DASH",LAMTA bus to LAX,8,1,7,LA
+-13151436.1824,4048062.7091,85,Hilton Hotel,PASADENA,PAS,150 S. Los Robles at Cordova,91101, , , , ,19, , ,2,0,7,LA
+-13168248.4033,3993377.8723,86,Public Library,SAN PEDRO,SPO,931 South Gaffey St.,90731, , , , ,1b, , ,2,0,7,LA
+-13194382.0557,4079902.4846,87,Newhall Metrolink Station,SANTA CLARITA/NEWHALL,NHL,24300 Railroad Ave. at Market,91321, , ,Metrolink,Antelope Valley Line,1, , ,3,1,7,LA
+-13185606.5133,4057237.291,88,Amtrak/Metrolink Station,VAN NUYS,VNC,7724 Van Nuys Blvd.,91405,Amtrak,"Coast Starlight,Pacific Surfliner",Metrolink,Ventura County Line,"1,4", ,LAX Flyaway Bus to LAX,7,1,7,LA
+-13202430.5817,4062813.7264,89,Amtrak/Metrolink Station,CHATSWORTH,CWT,10040 Old Depot Plaza Rd.,91311,Amtrak,Pacific Surfliner,Metrolink,Ventura County Line,"1,4",Chatsworth Metro Bus, ,5,1,7,LA
+-13164535.9808,4045415.6807,90,Amtrak/Metrolink Station,GLENDALE,GDL,Railroad & Cerritos Ave.,91204,Amtrak,Pacific Surfliner,Metrolink,"Antelope Valley Line,Burbank-Bob Hope Airport,Ventura County Line","1b,4",Glendale Bee Line, ,5,1,7,LA
+-13165326.9903,4059779.7872,91,I-210 at Lowel Ave.,LA CRESCENTA,LCA,Honolulu & Lowel Aves.,91214, , , , ,19, , ,2,0,7,LA
+-13150854.2485,4122724.6178,92,Metrolink Station,LANCASTER,LCS,44812 N. Sierra Highway,93534, , ,Metrolink,Antelope Valley Line,12, , ,3,1,7,LA
+-13149020.8314,4108446.1382,93,Transportation Center,PALMDALE,PMD,39000 Clock Tower Plaza Drive,93550, , ,Metrolink,Antelope Valley Line,12, , ,3,1,7,LA
+-13107929.5988,4036733.4028,94,Amtrak Station,POMONA,POS,156 W. Commonwealth St.,91768,Amtrak,"Sunset Limited,Texas Eagle", , , , , ,1,0,7,LA
+-13166323.745,3995168.9666,95,Catalina Terminal,SAN PEDRO,SPD,Berth 95 (Under Vincent Thomas Br),90731, , , , ,1b, , ,2,0,7,LA
+-13366630.2405,4442291.0528,96,Amtrak Station,MADERA,MDR,18770 Road 26,93638,Amtrak,San Joaquin, , , , , ,1,0,6,MAD
+-13331901.1768,4534232.7854,97,Yosemite View Lodge,EL PORTAL,EPL,11136 Highway 140,95318, , , , ,15, , ,2,0,10,MPA
+-13354562.4646,4507039.7059,98,YARTS Bus Stop,MARIPOSA,MRP,Hwy 140 at 7th St.,95338, , , , ,15, , ,2,0,10,MPA
+-13354578.9469,4507022.3978,99,Across from Visitor's Center,MARIPOSA,MRP,Hwy 140 at Hwy 49,95338, , , , ,15, , ,2,0,10,MPA
+-13350233.2914,4516687.5601,100,Yosemite Bug Hostel,MIDPINES,MDP,6979 Highway 140,95345, , , , ,15, , ,2,0,10,MPA
+-13313678.7674,4543493.31,101,Yosemite Lodge,YOSEMITE,YOS,Yosemite National Park,95389, , , , ,15, , ,2,0,10,MPA
+-13731155.3701,4780911.2126,102,California Western Depot,WILLITS,WTS,297 E. Commercial St. at CWR/NWP Tks,95490, , , , ,7, , ,2,0,1,MEN
+-13745977.9568,4820523.7987,103,Park n Takit Store & Deli,LAYTONVILLE,LTV,44900 Highway 101,95454, , , , ,7, , ,2,0,1,MEN
+-13772494.9066,4848100.5783,104,Price's Peg House,LEGGETT,LEG,69501 Highway 101 (Opposite Standish-Hickey State Recreation Area),95585, , , , ,7, , ,2,0,1,MEN
+-13714001.8436,4743396.4085,105,Burger King,UKIAH,UKH,711 E. Perkins St.,95481, , , , ,7, , ,2,0,1,MEN
+-13411433.7418,4481983.0972,106,Amtrak Station,MERCED,MCD,324 W. 24th St.,95340,Amtrak,San Joaquin, , ,15,Merced The Bus, ,5,1,10,MER
+-13570924.8709,4375064.6131,107,Chevron Station,CARMEL,CRM,3645 Rio Road at Hwy 1,93923, , , , ,68, , ,2,0,5,MON
+-13485165.5387,4328824.9062,108,McDonald's,KING CITY,KGC,1350 Broadway Circle,93930, , , , ,"17,21", , ,2,0,5,MON
+-13569177.6768,4383175.677,109,Transit Plaza,MONTEREY,MRY,Tyler & Pearl,93940, , , , ,"55,68", , ,2,0,5,MON
+-13570041.4325,4385967.4809,110,Monterey Bay Aquarium,MONTEREY-Aquarium,MYA,"886 Cannery Row, at David Ave.",93940, , , , ,68, , ,2,0,5,MON
+-13567305.6029,4382531.9906,111,Hyatt-Regency Monterey,MONTEREY-Hyatt,MYH,1 Old Golf Course Rd.,93940, , , , ,68, , ,2,0,5,MON
+-13569265.2155,4383569.0537,112,Monterey Marriott Hotel,MONTEREY-Marriott,MYM,350 Calle Principal,93940, , , , ,68, , ,2,0,5,MON
+-13569090.1518,4382910.5337,113,Monterey Travelodge,MONTEREY-Travelodge,MYT,675 Munras Ave.,93940, , , , ,68, , ,2,0,5,MON
+-13542785.9544,4394335.9146,114,Amtrak Station,SALINAS,SNS,11 Station Place,93901,Amtrak,Coast Starlight, , ,"17,21,68", , ,3,1,5,MON
+-13612609.7762,4622422.1914,115,Napa Valley Wine Train Depot,NAPA,NPW,1275 McKinstry St.,94559, , , , ,7, , ,2,0,4,NAP
+-13613000.8693,4621897.5505,116,VINE Transit Center,NAPA,NAP,Pearl St. at Main St.,94559, , , , ,7, , ,2,0,4,NAP
+-13379063.2813,4768706.1137,117,Amtrak Station,TRUCKEE,TRU,10065 Donner Pass Road,96161,Amtrak,California Zephyr, , ,20a, , ,3,1,3,NEV
+-13122608.2389,4002477.0474,118,Amtrak Station,ANAHEIM,ANA,2150 E. Katella (Edison Stadium),92806,Amtrak,Pacific Surfliner,Metrolink,Orange County Line,1,OCTA, ,5,1,12,ORA
+-13127054.3063,4011183.6827,119,Amtrak/Metrolink Station,FULLERTON,FUL,120 E. Santa Fe Ave.,92832,Amtrak,"Pacific Surfliner,Southwest Chief",Metrolink,"91 Line,Orange County Line","1a,39",OCTA, ,5,1,12,ORA
+-13105938.252,3982814.0844,120,Transportation Center,IRVINE,IRV,15215 Barranca St.,92618,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line", ,OCTA, ,4,1,12,ORA
+-13098462.0335,3962051.6179,121,Amtrak Station,SAN JUAN CAPISTRANO,SNC,26701 Verdugo St.,92675,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line",1a,OCTA, ,5,1,12,ORA
+-13119669.4821,3995482.8428,122,Regional Trans. Center,SANTA ANA,SNA,1000 Santa Ana Blvd.,92701,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line",1a,OCTA,OCTA bus to John Wayne Orange County Airport (SNA),8,1,12,ORA
+-13093378.4523,3951134.9143,123,Amtrak Station,SAN CLEMENTE PIER,SNP,Municipal Pier,92676,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line", ,OCTA, ,4,1,12,ORA
+-13478848.647,4707947.2165,124,Amtrak Station,AUBURN,ARN,277 Nevada St. at Fulweiler,95603,Amtrak,Capitol Corridor, , ,"3,20a","Placer County Transit,Auburn Transit", ,5,1,3,PLA
+-13501445.3812,4685966.9648,125,Amtrak Station,ROSEVILLE,RSV,201 Pacific St. at Church,95678,Amtrak,"California Zephyr,Capitol Corridor", , ,"3,20a",Roseville Transit, ,5,1,3,PLA
+-13464448.6684,4735756.1766,126,Amtrak Station,COLFAX,COX,99 Railroad St.,95713,Amtrak,California Zephyr, , ,20a, , ,3,1,3,PLA
+-13496072.5042,4691817.314,127,Amtrak Station,ROCKLIN,RLN,Rocklin Rd. at Railroad Ave.,95677,Amtrak,Capitol Corridor, , ,"3,20a",Placer County Transit, ,5,1,3,PLA
+-13017633.814,3994978.1452,128,Coco's Family Restaurant,HEMET,HET,3246 West Florida Ave.,92544, , , , ,19a, , ,2,0,8,RIV
+-13020972.9256,3995440.4396,129,Simpson Center,HEMET,HMT,308 East Devonshire,92543, , , , ,19a, , ,2,0,8,RIV
+-13056725.9909,4017634.9425,130,Big O Tires,MORENO VALLEY,MOV,2624 East Alesando Blvd.,92508, , , , ,19a, , ,2,0,8,RIV
+-12970028.8686,4005091.2805,131,Palm Springs Airport,PALM SPRINGS,PSP,3400 Tahquitz Canyon Way,92262, , , , ,"19b,39", , ,2,0,8,RIV
+-13045570.2752,3990024.5262,132,CL Travel,SUN CITY,SUT,26908 Cherry Hills Blvd.,92586, , , , ,19a, , ,2,0,8,RIV
+-12939085.2575,3990577.4064,133,Bus Stop,INDIO,IDO,Hwy 111 at Monroe Ave. (NE Corner),92201, , , , ,"19b,39", , ,2,0,8,RIV
+-12957379.9355,3991876.0254,134,Palm Desert Westfield Mall,PALM DESERT,PDC,72-840 Highway 111,92260, , , , ,"19b,39", , ,2,0,8,RIV
+-12974157.7434,4015099.0161,135,Amtrak Station,PALM SPRINGS NORTH,PSN,Indian Ave. at UP Tracks & I-10,92262,Amtrak,"Sunset Limited,Texas Eagle", , , , , ,1,0,8,RIV
+-13049541.8415,4002339.2966,136,Intl House of Pancakes,PERRIS,PRI,1688-J No. Perris Blvd.,92571, , , , ,19a, , ,2,0,8,RIV
+-13065543.8286,4025524.9795,137,Metrolink Station,RIVERSIDE-DOWNTOWN,RIV,4066 Vine St.,92501,Amtrak,Southwest Chief,Metrolink,"91 Line,Inland Empire-Orange County Line,Riverside Line,San Bernardino Line","19,39", , ,3,1,8,RIV
+-13525279.6176,4662140.9528,138,Amtrak Station,SACRAMENTO,SAC,"401 ""I"" St. (at 5th)",95814,Amtrak,"California Zephyr,Capitol Corridor,Coast Starlight,San Joaquin", , ,"3,20a,20c","Sacramento Regional Transit,Yolobus",Yolobus to SMF,8,1,3,SAC
+-13524802.2071,4661100.5534,139,State Capitol,SACRAMENTO,SCS,10th St. at N Street,95814, , , , ,3, , ,2,0,3,SAC
+-13523154.0804,4639691.6494,140,Across from McDonald's,ELK GROVE,EKG,Harbor Point Dr. at Renwick Ave.,95758, , , , ,3, , ,2,0,3,SAC
+-13024582.5574,4149305.0529,141,Barstow Station/Mcdonalds,BARSTOW,BBS,1611 East Main St.,92311, , , , ,9, , ,2,0,8,SBD
+-12757930.5068,4142250.369,142,Amtrak Station,NEEDLES,NDL,900 Front St.,92363,Amtrak,Southwest Chief, , , , , ,1,0,8,SBD
+-13096563.5006,4037146.8252,143,Amtrak Station,ONTARIO,ONA,228 South Plum St.,91761,Amtrak,"Sunset Limited,Texas Eagle", , ,19, , ,3,1,8,SBD
+-13058806.8775,4042820.389,144,Amtrak/Metrolink Station,SAN BERNARDINO,SNB,1170 W. 3rd St.,92410,Amtrak,Southwest Chief,Metrolink,"Inland Empire-Orange County Line,San Bernardino Line",19, , ,3,1,8,SBD
+-13066678.7285,3920888.788,145,Transportation Center,OCEANSIDE,OSD,235 S. Tremont Ave.,92054,Amtrak,Pacific Surfliner,"Coaster,Metrolink,Sprinter","Coaster,Inland Empire-Orange County Line,Orange County Line",1a,"NCTD Breeze,San Diego MTS", ,5,1,11,SD
+-13046598.3733,3862804.6233,146,Transit Center,SAN DIEGO-OLD TOWN,OLT,"4005 Taylor St., at Congress St.",92110,Amtrak,Pacific Surfliner,Coaster,Coaster, ,"NCTD Breeze,San Diego MTS", ,4,1,11,SD
+-13043278.8776,3857757.7159,147,Sante Fe Depot,SAN DIEGO,SAN,1050 Kettner Blvd.,92101,Amtrak,Pacific Surfliner,Coaster,Coaster,1a,"NCTD Breeze,San Diego MTS",San Diego Transit bus to SAN,8,1,11,SD
+-13054504.2348,3894226.0793,148,Amtrak Station,SOLONA BEACH,SOL,105 Cedros Ave.,92075,Amtrak,Pacific Surfliner,Coaster,Coaster,1a,"NCTD Breeze,San Diego MTS", ,5,1,11,SD
+-13625098.1324,4550313.8171,149,Financial District,SAN FRANCISCO,SFF,California & Drumm St. (Hyatt Regency),94111, , , , ,"34,99", , ,2,0,4,SF
+-13626265.2715,4549065.4435,150,SF Shopping Center,SAN FRANCISCO,SFS,835 Market St. (at Powell),94103, , , , ,99, , ,2,0,4,SF
+-13625677.8217,4548976.518,151,Caltrain Station,SAN FRANCISCO,SFM,Howard St. at 4th St.,94103, , , , ,99, , ,2,0,4,SF
+-13624968.0595,4547934.4182,152,Caltrain Station,SAN FRANCISCO,SFP,4th & Townsend Sts.,94107, , , , ,"34,99", , ,2,0,4,SF
+-13626563.5282,4552368.1473,153,Pier 39,SAN FRANCISCO,SFW,Bus Turnout Main Ent-The Embarcadero,94133, , , , ,99, , ,2,0,4,SF
+-13499965.7852,4598353.6683,154,Transportation Center,LODI,LOD,24 South Sacramento St.,95240,Amtrak,San Joaquin, , ,"3,6,34",Lodi GrapeLine Transit, ,5,1,10,SJ
+-13501397.3399,4571761.8009,155,Amtrak Station,STOCKTON,SKN,735 S. San Joaquin St.,95203,Amtrak,San Joaquin, , ,"3,6,34",San Joaquin RTD, ,5,1,10,SJ
+-13501404.3816,4571742.5564,156,ACE Station,STOCKTON,SKT,North Aurora at East Weber Streets,95202,Amtrak,San Joaquin,SJRRC,ACE,"3,6,34",San Joaquin RTD, ,5,1,10,SJ
+-13433248.3545,4230754.3166,157,Denny's Restaurant,ATASCADERO,ATA,6910 El Camino Real,93422, , , , ,"17,18a", , ,2,0,5,SLO
+-13431316.3979,4201375.4058,158,Amtrak Station,SAN LUIS OBISPO,SLO,1011 Railroad Ave. at Santa Rosa,93401,Amtrak,"Coast Starlight,Pacific Surfliner", , ,"17,18a,21","San Luis Obispo RTA,SLO Transit", ,5,1,5,SLO
+-13428356.343,4180445.8188,159,Amtrak Station,GROVER BEACH,GVB,150 Highway 1 at Grand Ave.,93433,Amtrak,Pacific Surfliner, , ,"17,18a,21", , ,3,1,5,SLO
+-13434915.197,4248818.741,160,Amtrak Station,PASO ROBLES,PRB,Pine St. at 8th St.,93446,Amtrak,Coast Starlight, , ,"17,18,21", , ,3,1,5,SLO
+-13379149.6633,4111129.3175,161,Burger King,BUELLTON,BUL,238 East Highway 246,93427, , , , ,"17,21", , ,2,0,5,SB
+-13305123.2105,4082083.7867,162,Amtrak Station,CARPINTERIA,CPN,475 Linden Ave.,93013,Amtrak,Pacific Surfliner, , ,"4,10",Santa Barbara MTD, ,5,1,5,SB
+-13422229.6244,4158543.0983,163,Amtrak Station,GUADALUPE,GUA,330 Guadalupe St. (HWY 1),93434,Amtrak,Pacific Surfliner, , ,17,Guadalupe Flyer, ,5,1,5,SB
+-13409454.0222,4114891.1796,164,Visitor's Center,LOMPOC,LOM,111 South I St.,93436, , , , ,17, , ,2,0,5,SB
+-13373895.8215,4109115.9424,165,Solvang Park,SOLVANG,SLV,1630 Mission Dr. at 1st St.,93463, , , , ,"17,21", , ,2,0,5,SB
+-13404696.909,4157356.7133,166,Intl House of Pancakes,SANTA MARIA,SAT,Nicholson Ave. (US 101 @ Main St),93454, , , , ,"17,18a,21", , ,2,0,5,SB
+-13425543.5848,4120841.9984,167,Amtrak Station,SURF/LOMPOC,LPS,End of Ocean Ave. at Surf Beach,93436,Amtrak,Pacific Surfliner, , , , , ,1,0,5,SB
+-13532759.1285,4439726.8575,168,In Front of Caltrain Depot,GILROY,GLY,7250 Monterey Rd. at Depot St.,95020, , ,PCJPB,Caltrain,"21,55", , ,3,1,4,SCL
+-13312409.5596,4544204.5945,169,Yosemite Village. Transfer point to park shuttles,YOSEMITE NATIONAL PARK,YOV,National Park Visitor Center,95389, , , , ,15, , ,2,0,10,MPA
+-13549649.1139,4536711.8319,170,ACE Station,VASCO ROAD,VAS,575 South Vasco Road,94550, , ,SJRRC,ACE, , , ,1,0,4,ALA
+-13567899.6344,4531316.9627,171,ACE Station,PLEASANTON,PLS,4950 Pleasanton Avenue,94566, , ,SJRRC,ACE, , , ,1,0,4,ALA
+-13544355.9947,4409799.0716,172,Caltrans Park-and-Ride Lot,PRUNEDALE,PDL,Highway 156 and Hwy 101,93907, , , , ,55, , ,2,0,5,MON
+-13057038.1699,4101172.3159,173,Victor Valley Transit Center/Greyhound Station,VICTORVILLE,VRB,16838 South D Street,92395, , , , ,12, , ,2,0,8,SBD
+-12973735.1316,4005237.6691,174,Palm Springs Sunline Stop,PALM SPRINGS DOWNTOWN,PSS,Indian Canyon Dr and Andreas Rd,92262, , , , ,"19b,39", , ,2,0,8,RIV
+-12945331.4779,3990088.4844,175,SunLine Transit Stop next to Eisenhower Occupational Health,LA QUINTA,LQT,78822 Highway 111,92253, , , , ,"19b,39", , ,2,0,8,RIV
+-13002748.8001,4018314.2783,176,Morongo Casino Hotel Resort,CABAZON,CBZ,49500 Seminole Drive,92230, , , , ,"19b,39", , ,2,0,8,RIV
+-13330819.3962,4798345.7836,177,The Nugget,"SPARKS, NV",SPX,1100 Nugget Ave. (11th St. Entrance),89431, , , , ,20a, , ,2,0,0, 
+-12845052.9548,4247420.1604,178,Whiskey Pete's,"PRIMM, NV",PMM,I-15 at Primm Exit,89019, , , , ,9, , ,2,0,0, 
+-12818163.0405,4324044.4542,179,Greyhound Depot (Door 6),LAS VEGAS,LVS,200 South Main St.,89101, , , , ,9, , ,2,0,0, 
+-13337450.4623,4797666.1026,180,Amtrak Station,"RENO, NV",RNO,280 North Center St.,89501,Amtrak,California Zephyr, , ,20a, , ,3,1,0, 
+-13624698.1223,4545205.0953,181, ,22ND ST, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SF
+-13625652.9928,4538445.7095,182, ,BAYSHORE, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SF
+-13626068.1151,4530975.3825,183, ,SOUTH SAN FRANCISCO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13626392.4739,4526417.1997,184, ,SAN BRUNO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13624066.3855,4523097.641,185, ,MILLBRAE TRANSIT CENTER, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13621383.3086,4521317.6142,186, ,BROADWAY, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13619351.0037,4520232.7417,187, ,BURLINGAME, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13617058.8206,4518636.37,188, ,SAN MATEO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13615438.2686,4516492.8335,189, ,HAYWARD PARK, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13614143.8766,4514364.4559,190, ,HILLSDALE, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13611718.2664,4511968.3228,191, ,BELMONT, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13609901.6139,4510053.2052,192, ,SAN CARLOS, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13606792.3679,4507060.3253,193, ,REDWOOD CITY, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13602998.547,4504038.4701,194, ,ATHERTON, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13601360.2195,4502738.477,195, ,MENLO PARK, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SM
+-13599347.5675,4501091.4064,196, ,PALO ALTO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13589519.4085,4494259.5514,197, ,MOUNTAIN VIEW, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13584475.8721,4492036.5289,198, ,SUNNYVALE, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13580667.9072,4490883.4797,199, ,LAWRENCE, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13573927.9129,4488491.0327,200, ,SANTA CLARA, , ,0, , ,"PCJPB,SJRRC","ACE,Caltrain", , , ,1,0,4,SCL
+-13571563.4169,4487024.1932,201, ,COLLEGE PARK, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13570190.026,4485253.8092,202, ,SAN JOSE DIRIDON, , ,0, , ,"PCJPB,SJRRC","ACE,Caltrain", , , ,1,0,4,SCL
+-13568070.2273,4482675.9096,203, ,TAMIEN, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13563371.7866,4478757.272,204, ,CAPITOL, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13558435.9428,4474408.142,205, ,BLOSSOM HILL, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13537679.5492,4451236.0319,206, ,SAN MARTIN, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13596766.724,4499103.2934,207, ,CALIFORNIA AVENUE, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13624924.8004,4547914.258,208, ,SAN FRANCISCO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SF
+-13592946.1701,4496061.831,209, ,SAN ANTONIO, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13598392.9139,4500391.3535,210, ,STANFORD STADIUM, , ,0, , ,PCJPB,Caltrain, , , ,1,0,4,SCL
+-13498989.9955,4550989.3641,211, ,Lathrop/Manteca, , ,0, , ,SJRRC,ACE, , , ,1,0,10,SJ
+-13500712.0645,4573294.3049,212, ,Stockton, , ,0, , ,SJRRC,ACE, , , ,1,0,10,SJ
+-13612520.0187,4561650.128,213, ,NORTH BERKELEY, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13610839.2788,4561033.621,214, ,DOWNTOWN BERKELEY, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13611047.382,4558709.6426,215, ,ASHBY, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13609005.6069,4557483.4734,216, ,ROCKRIDGE, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13610713.5884,4555255.7622,217, ,MACARTHUR, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13610854.5314,4552348.6715,218, ,19TH STREET/OAKLAND, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13613805.8573,4551856.1925,219, ,WEST OAKLAND, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13611252.0752,4551576.2138,220, ,12TH ST/OAKLAND CITY CENTER, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13610537.7505,4550883.966,221, ,LAKE MERRITT, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13605935.3794,4547627.3924,222, ,FRUITVALE, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13602927.866,4544712.76,223, ,COLISEUM/OAKLAND AIRPORT (OAK), , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13598904.0477,4540254.7469,224, ,SAN LEANDRO, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13595122.1158,4536789.7511,225, ,BAY FAIR, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13589484.4363,4535826.0193,226, ,CASTRO VALLEY, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13590685.3953,4532929.6312,227, ,HAYWARD, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13587327.2202,4527918.4372,228, ,SOUTH HAYWARD, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13582887.1208,4521788.9137,229, ,UNION CITY, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13578490.2737,4517233.7293,230, ,FREMONT, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13574937.6254,4582098.0942,231, ,PITTSBURG/BAY POINT, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13583718.5423,4579870.3971,232, ,NORTH CONCORD/MARTINEZ, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13584253.6003,4575529.4706,233, ,CONCORD, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13616254.4194,4568862.1327,234, ,EL CERRITO DEL NORTE, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13587213.4607,4569273.4549,235, ,PLEASANT HILL/CONTRA COSTA CEN, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13614252.576,4565676.8017,236, ,EL CERRITO PLAZA, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13588489.9419,4566020.4986,237, ,WALNUT CREEK, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13594979.1326,4564305.0119,238, ,LAFAYETTE, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13601411.2291,4562358.3195,239, ,ORINDA, , ,0, , ,BART,BART, , , ,1,0,4,CC
+-13625064.0932,4550256.0864,240, ,EMBARCADERO, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13625677.0869,4549645.3222,241, ,MONTGOMERY STREET, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13626265.2715,4549065.4435,242, ,POWELL STREET, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13627084.6878,4548247.8599,243, ,CIVIC CENTER/ UN PLAZA, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13627671.5766,4546237.1329,244, ,16TH STREET & MISSION, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13627543.3227,4544561.131,245, ,24TH STREET & MISSION, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13629286.0779,4541794.4018,246, ,GLEN PARK, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13630752.0034,4540172.4605,247, ,BALBOA PARK, , ,0, , ,BART,BART, , , ,1,0,4,SF
+-13633149.5805,4538079.9999,248, ,DALY CITY, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13632875.2002,4534967.0093,249, ,COLMA, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13627245.4548,4528318.7775,250, ,SAN BRUNO, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13624512.5702,4525360.8802,251, ,SFO INTERNATIONAL AIRPORT, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13624035.5796,4523119.5097,252, ,MILLBRAE, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13630409.2329,4532111.4572,253, ,SOUTH SAN FRANCISCO, , ,0, , ,BART,BART, , , ,1,0,4,SM
+-13572923.9405,4537114.6747,254, ,WEST DUBLIN/PLEASANTON, , ,0, , ,BART,BART, , , ,1,0,4,ALA
+-13049498.2141,3882470.0933,255, ,Sorrento Valley, , ,0, , ,Coaster,Coaster, , , ,1,0,11,SD
+-13063445.7717,3916669.635,256, ,Carlsbad Village, , ,0, , ,Coaster,Coaster, , , ,1,0,11,SD
+-13059895.7932,3909747.6192,257, ,Carlsbad Poinsettia, , ,0, , ,Coaster,Coaster, , , ,1,0,11,SD
+-13057011.3788,3901532.4601,258, ,Encinitas, , ,0, , ,Coaster,Coaster, , , ,1,0,11,SD
+-13269838.0822,4062542.2286,259, ,East Ventura, , ,0, , ,Metrolink,Ventura County Line, , , ,1,0,7,VEN
+-13107925.8782,4036690.6246,260, ,Downtown Pomona, , ,0, , ,Metrolink,Riverside Line, , , ,1,0,7,LA
+-13194136.6012,4084449.1038,261, ,Santa Clarita, , ,0, , ,Metrolink,Antelope Valley Line, , , ,1,0,7,LA
+-13151710.5491,4027587.0606,262, ,Commerce, , ,0, , ,Metrolink,Orange County Line, , , ,1,0,7,LA
+-13142379.9527,4017559.7929,263, ,Norwalk/ Santa Fe Springs, , ,0, , ,Metrolink,"91 Line,Orange County Line", , , ,1,0,7,LA
+-13154804.6578,4037123.1902,264, ,Cal State LA, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,7,LA
+-13139630.2447,4039105.9351,265, ,El Monte, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,7,LA
+-13130993.1085,4040400.4795,266, ,Baldwin Park, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,7,LA
+-13123324.3578,4041175.6148,267, ,Covina, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,7,LA
+-13108209.0626,4041373.6907,268, ,Pomona (North), , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,7,LA
+-13170536.7864,4052871.0658,269, ,Downtown Burbank, , ,0, , ,Metrolink,"Antelope Valley Line,Burbank-Bob Hope Airport,Ventura County Line", , , ,1,0,7,LA
+-13185828.2015,4068159.2028,270, ,Sylmar/San Fernando, , ,0, , ,Metrolink,Antelope Valley Line, , , ,1,0,7,LA
+-13196375.8283,4059817.1087,271, ,Northridge, , ,0, , ,Metrolink,Ventura County Line, , , ,1,0,7,LA
+-13187988.0208,4083825.4169,272, ,Via Princessa, , ,0, , ,Metrolink,Antelope Valley Line, , , ,1,0,7,LA
+-13119836.0426,4000487.739,273, ,Orange, , ,0,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line", ,OCTA, ,4,1,12,ORA
+-13117951.756,4009258.8592,274, ,Anaheim Canyon, , ,0, , ,Metrolink,Inland Empire-Orange County Line, , , ,1,0,12,ORA
+-13114095.1045,3989669.598,275, ,Tustin, , ,0, , ,Metrolink,"Inland Empire-Orange County Line,Orange County Line", , , ,1,0,12,ORA
+-13148858.8919,4095851.3795,276, ,Vincent Grade/Acton, , ,0, , ,Metrolink,Antelope Valley Line, , , ,1,0,7,LA
+-13149702.0519,4029754.7349,277, ,Montebello/ Commerce, , ,0, , ,Metrolink,Riverside Line, , , ,1,0,7,LA
+-13101821.6293,4041420.2554,278, ,Montclair, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,8,SBD
+-13096460.0331,4041488.4975,279, ,Upland, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,8,SBD
+-13086698.8259,4041146.1171,280, ,Rancho Cucamonga, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,8,SBD
+-13073150.7124,4041578.3085,281, ,Fontana, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,8,SBD
+-13088903.4338,4034142.9511,282, ,East Ontario, , ,0, , ,Metrolink,Riverside Line, , , ,1,0,8,SBD
+-13077407.7944,4025860.3303,283, ,Pedley, , ,0, , ,Metrolink,Riverside Line, , , ,1,0,8,RIV
+-13092688.0461,4013482.2853,284, ,West Corona, , ,0, , ,Metrolink,"91 Line,Inland Empire-Orange County Line", , , ,1,0,8,RIV
+-13076735.5315,4015383.3287,285, ,Riverside-La Sierra, , ,0, , ,Metrolink,"91 Line,Inland Empire-Orange County Line", , , ,1,0,8,RIV
+-13177275.6442,4058706.7458,286, ,Sun Valley, , ,0, , ,Metrolink,Antelope Valley Line, , , ,1,0,7,LA
+-13118521.4849,4029853.8761,287, ,Industry, , ,0, , ,Metrolink,Riverside Line, , , ,1,0,7,LA
+-13065785.4066,4041797.8596,288, ,Rialto, , ,0, , ,Metrolink,San Bernardino Line, , , ,1,0,8,SBD
+-13134255.2286,4012125.2964,289, ,Buena Park, , ,0, , ,Metrolink,"91 Line,Orange County Line", , , ,1,0,7,LA
+-13087107.5134,4012979.9525,290, ,North Main Corona, , ,0, , ,Metrolink,"91 Line,Inland Empire-Orange County Line", , , ,1,0,8,RIV
+-13099449.6589,3968925.6701,291, ,Laguna Niguel/ Mission Viejo, , ,0,Amtrak,Pacific Surfliner,Metrolink,"Inland Empire-Orange County Line,Orange County Line", ,OCTA, ,4,1,12,ORA
+-13094835.9888,3952796.5882,292, ,San Clemente, , ,0, , ,Metrolink,"Inland Empire-Orange County Line,Orange County Line", , , ,1,0,12,ORA

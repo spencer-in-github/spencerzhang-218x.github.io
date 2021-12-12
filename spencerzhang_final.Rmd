@@ -5,7 +5,7 @@ date: "12/4/2021"
 output:
   rmdcss::html_modest
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -18,6 +18,7 @@ library(sf)
 library(tigris)
 library(leaflet)
 library(censusapi)
+library(corrplot)
 ```
 
 ```{r system}
@@ -39,7 +40,7 @@ saveRDS(acs_vars_2019_5yr, "acs_vars_2019_5yr.rds")
 acs_vars_2019_5yr <- readRDS("acs_vars_2019_5yr.rds")
 ```
 
-```{r tp-total-data}
+```{r tp-total-data, eval = F}
 bay_means <-
   getCensus(
     name = "acs/acs5",
@@ -78,10 +79,13 @@ bay_means <-
 
 saveRDS(bay_means, "bay_tp_means.rds")
 ```
+
 ### Introduction & Background
+
 In this mini project, we want to get some preliminary insights into the transportation accessibility and commute behavior in the Bay Area, with a specific focus on public transportation.
 
 First, we take a general overlook into the commute means makeup among the Bay Area workers. As shown in the figure below, more than half of the Bay Area workers drive alone to work, a transportation habit that accounts for major greenhouse emissions. Only less than a quarter of the worker population take public transportation to work.
+
 ```{r bay-means-plot, fig.cap="Fig.1 The Bay Area worker commute means composition", fig.align='center'}
 bay_means = readRDS("bay_tp_means.rds")
 ggplot(bay_means) +
@@ -132,7 +136,9 @@ tp_by_residence <-
   summarise(estimate = sum(estimate))
 saveRDS(tp_by_residence,"tp_by_residence.rds")
 ```
-It is intuitively plausible that the distance between one's place of work and residence would in some way affect choices of commute. The work/home location situation in the Bay Area is outlined in Figure 2. Nearly 2/3 of the worker population reside in the same county of their work place. With the great number of people living relatively adjacent to their work place, one would expect a higher preference to the public transportation system since it's easier to access and time-efficient within one single county area, however the statistics here show the opposite. 
+
+It is intuitively plausible that the distance between one's place of work and residence would in some way affect choices of commute. The work/home location situation in the Bay Area is outlined in Figure 2. Nearly 2/3 of the worker population reside in the same county of their work place. With the great number of people living relatively adjacent to their work place, one would expect a higher preference to the public transportation system since it's easier to access and time-efficient within one single county area, however the statistics here show the opposite.
+
 ```{r work-residence-pie}
 tp_by_residence = readRDS("tp_by_residence.rds")
 tp_by_residence %>%
@@ -152,10 +158,15 @@ tp_by_residence %>%
        title = "Bay Area Worker Composition by Work Place",
        fill = "Place of residence")
 ```
-What would be the underlying issue that hinders the Bay Area population's enthusiasm to take the public transportation? What factors influence worker's choice of commute transportation? Does people of different working conditions, socioeconomic status, and identities make different choices when it comes to transportation? Further analysis and personal interpretation is presented below for reader's reference.
+
+What would be the underlying issue that hinders the Bay Area population's enthusiasm to take the public transportation? What factors influence the worker's choice of commute transportation? Does people of different working conditions, socioeconomic status, and identities make different choices when it comes to transportation? Further analysis and personal interpretation is presented below for readers' reference.
 
 ### Possible influencing factor inspection
+
+#### Means of transportation by work/home distance
+
 The population show different preferences to different transportation means when they reside inside or outside the county of their workplace, outlined in Figure 2. What is interesting about this figure is that among people taking public transportation, there are more people who live far from the place of work. There might be other confounding factors such as income. One hypothesis is that people with lower income tend to reside in places with lower rent, where might be far from their working location; thus they tend to watch their daily expenses more and may likely not have a car.
+
 ```{r tp-by-work-residence-plot, fig.cap= "Fig. 2 The Bay Area worker commute means by work/home location"}
 tp_by_residence %>%
   ggplot() +
@@ -171,8 +182,8 @@ tp_by_residence %>%
   labs(
     x = "Means of transportation",
     y = "Number of population",
-    title = "The Bay Area means of transportation by industry",
-    fill = "Work/Residence situation"
+    title = "The Bay Area means of transportation by work/home distance",
+    fill = "Work/Residence distance"
   ) +
   coord_flip() +
   theme(
@@ -182,7 +193,8 @@ tp_by_residence %>%
   guides(fill = guide_legend(reverse = T))
 ```
 
-#### means of transportation by race
+#### Means of transportation by race
+
 ```{r race-cate-define}
 #A-G
 census_race_categories <- 
@@ -196,6 +208,7 @@ census_race_categories <-
     "Two or More Races"
   )
 ```
+
 ```{r tp-race-data, eval = F}
 tp_by_race <-
   1:7 %>%
@@ -238,7 +251,9 @@ tp_by_race <-
   })
 write_rds(tp_by_race, "tp_by_race.rds")
 ```
+
 The population percentage driving alone to work doesn't vary significantly among different races in the Bay Area, as outlined in Figure 3, however the percentage of population taking public transportation is significantly higher in African American and Asian population. This still may be correlated with income status.
+
 ```{r tp-by-race-plot, fig.cap="Fig. 3 The Bay Area worker commute transportation choice by race"}
 tp_by_race <- readRDS("tp_by_race.rds")
 tp_by_race %>%
@@ -266,7 +281,8 @@ tp_by_race %>%
   guides(fill = guide_legend(reverse = T))
 ```
 
-#### means of transportation by income
+#### Means of transportation by income
+
 ```{r tp-income-data, eval = F}
 tp_by_income <-
   getCensus(
@@ -299,7 +315,9 @@ tp_by_income <-
   summarise(estimate = sum(estimate))
 saveRDS(tp_by_income,"tp_by_income.rds")
 ```
+
 The commute choice of population by income sectors is outlined in Figure 4. Surprisingly the choice preferences for driving alone and public transportation both show a bipolar trend, with the former one having the middle income population's preference and the latter one being favored by low income as well as extremely high income.
+
 ```{r tp-by-income-plot, fig.cap="Fig. 4 The Bay Area worker commute transportation choice by income"}
 tp_by_income <- readRDS("tp_by_income.rds")
 tp_by_income %>%
@@ -327,7 +345,8 @@ tp_by_income %>%
   guides(fill = guide_legend(reverse = T))
 ```
 
-#### means of transportation by industry
+#### Means of transportation by industry
+
 ```{r tp-by-industry-data,eval=F}
 tp_by_industry <-
   getCensus(
@@ -361,24 +380,26 @@ tp_by_industry <-
 saveRDS(tp_by_industry,"tp_by_industry.rds")
 ```
 
+The choices of commute vary slightly among industries. While the majority of all industries prefer to drive alone to work, sales, office, and service occupation show slight predilection for public transportation and walking. For office occupation, simple hypothesis is that such workers tend to live close to work places.
+
 ```{r tp-by-industry-plot, fig.cap="Fig. 5 The Bay Area worker commute transportation choice by industry"}
 tp_by_industry = readRDS("tp_by_industry.rds")
 tp_by_industry %>%
   ggplot() +
   geom_bar(
     aes(
-      x = means %>% factor(levels = rev(unique(tp_by_industry$means))),
+      x = industry %>% factor(levels = rev(unique(tp_by_industry$industry))),
       y = estimate,
-      fill = industry %>% factor(levels = rev(unique(tp_by_industry$industry)))
+      fill = means %>% factor(levels = rev(unique(tp_by_industry$means)))
     ),
     stat = "identity",
     position = "fill"
   ) +
   labs(
-    x = "Means of transportation",
+    x = "Industry",
     y = "Number of population",
     title = "Bay Area means of transportation by industry",
-    fill = "Industry"
+    fill = "Means of transportation"
   ) +
   coord_flip() +
   theme(
@@ -388,4 +409,411 @@ tp_by_industry %>%
   guides(fill = guide_legend(reverse = T))
 ```
 
+### Geographical inspection
 
+#### Means of transportation to work in census tract level
+```{r pums-all-loading}
+pums_hca_2019_1yr <- read_csv("psam_h06.csv")
+```
+
+```{r pums-key-var-loading, eval = F}
+pums_2019_1yr_tp <- getCensus(
+  name = "acs/acs1/pums",
+  vintage = 2019,
+  region = "public use microdata area:*", 
+  regionin = "state:06",
+  vars = c(
+    "SERIALNO",
+    "SPORDER",
+    "PWGTP",
+    "WGTP",
+    "JWMNP", #travel time to work
+    "JWRIP", #Vehicle occupancy
+    "JWTRNS", #Means of transportation to work
+    "JWAP", #time of arrival at work
+    "JWDP", #time of departure at work
+    "PINCP", #total person income
+    "ACR", #lot size
+    "AGEP", #age
+    "CONP", #condo fee
+    "COW", #class of worker
+    "ENG", #ability to speak English
+    "GRNTP", #gross rent
+    "GRPIP", #gross rent as perc of HH income
+    "FULP" #fuel cost, yearly
+  )
+)
+saveRDS(pums_2019_1yr_tp, "pums_2019_1yr_tp.rds")
+```
+
+```{r pums-metadata-loading}
+ca_pumas <- 
+  pumas("CA", cb = T, progress_bar = F)
+
+bay_county_names <-
+  c(
+    "Alameda",
+    "Contra Costa",
+    "Marin",
+    "Napa",
+    "San Francisco",
+    "San Mateo",
+    "Santa Clara",
+    "Solano",
+    "Sonoma"
+  )
+
+bay_counties <-
+  counties("CA", cb = T, progress_bar = F) %>%
+  filter(NAME %in% bay_county_names)
+
+# bay_pumas <-
+#   ca_pumas %>% 
+#   st_centroid() %>% 
+#   .[bay_counties, ] %>% 
+#   st_drop_geometry() %>% 
+#   left_join(ca_pumas %>% select(GEOID10)) %>% 
+#   st_as_sf()
+
+# saveRDS(bay_pumas, "bay_pumas.rds")
+bay_pumas = readRDS("bay_pumas.rds")
+pums_2019_1yr_tp = readRDS("pums_2019_1yr_tp.rds")
+bay_pums <-
+  pums_2019_1yr_tp %>% 
+  mutate(
+    PUMA = str_pad(public_use_microdata_area,5,"left","0")
+  ) %>% 
+  filter(PUMA %in% bay_pumas$PUMACE10)
+
+```
+
+```{r}
+bay_pums_means <-
+  bay_pums %>% 
+  filter(!duplicated(SERIALNO)) %>% 
+  mutate(
+    WGTP = as.numeric(WGTP),
+    public_transport_pop = ifelse(
+      JWTRNS %in% c(2:6),
+      WGTP,
+      0
+    ),
+    car_pop = ifelse(
+      JWTRNS == 1,
+      WGTP,
+      0
+    ),
+    taxi_pop = ifelse(
+      JWTRNS == 7,
+      WGTP,
+      0
+    ),
+    bike_pop = ifelse(
+      JWTRNS %in% c(8:9),
+      WGTP,
+      0
+    ),
+    walk_pop = ifelse(
+      JWTRNS == 10,
+      WGTP,
+      0
+    ),
+    wfh_pop = ifelse(
+      JWTRNS == 11,
+      WGTP,
+      0
+    )
+  ) %>% 
+  group_by(PUMA) %>% 
+  summarize(
+    perc_public =
+      sum(public_transport_pop, na.rm =T)/sum(WGTP, na.rm = T)*100,
+    perc_car =
+      sum(car_pop, na.rm =T)/sum(WGTP, na.rm = T)*100,
+    perc_taxi =
+      sum(taxi_pop, na.rm =T)/sum(WGTP, na.rm = T)*100,
+    perc_bike =
+      sum(bike_pop, na.rm =T)/sum(WGTP, na.rm = T)*100,
+    perc_walk =
+      sum(walk_pop, na.rm =T)/sum(WGTP, na.rm = T)*100,
+    perc_wfh =
+      sum(wfh_pop, na.rm =T)/sum(WGTP, na.rm = T)*100
+  ) %>% 
+  left_join(
+    bay_pumas %>% 
+      select(PUMACE10),
+    by = c("PUMA" = "PUMACE10")
+  ) %>% 
+  st_as_sf()
+```
+
+As shown in Figure 6, the number of population taking public transportation to work varies significantly within the Bay Area. The population in San Francisco, Oakland, Berkeley, and the surrounding area show high predilection to public transportation where the rest of the Bay Area presents preference otherwise.
+
+```{r public-transportation-map, fig.cap="Fig. 6 The percentage of workers taking public transportation in the Bay Area", fig.align='center'}
+pums_pal <- colorNumeric(
+  palette = "Oranges",
+  domain = bay_pums_means$perc_public
+)
+
+leaflet() %>%
+  addTiles() %>% 
+  addPolygons(
+    data = bay_pums_means,
+    fillColor = ~pums_pal(perc_public),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.5,
+    weight = 1,
+    label = ~paste0(
+      round(perc_public), 
+      "% workers taking public transportation to commute"
+    ),
+    highlightOptions = highlightOptions(
+      weight = 2,
+      opacity = 1
+    )
+  ) %>% 
+  addLegend(
+    data = bay_pums_means,
+    pal = pums_pal,
+    values = ~perc_public,
+    title = "% workers taking public<br>transportation to commute",
+    position = "bottomleft"
+  )
+```
+
+```{r car-map, fig.cap="Fig. 7 The percentage of workers driving to work in the Bay Area", fig.align='center'}
+pums_pal <- colorNumeric(
+  palette = "Oranges",
+  domain = bay_pums_means$perc_car
+)
+
+leaflet() %>%
+  addTiles() %>% 
+  addPolygons(
+    data = bay_pums_means,
+    fillColor = ~pums_pal(perc_car),
+    color = "white",
+    opacity = 0.5,
+    fillOpacity = 0.5,
+    weight = 1,
+    label = ~paste0(
+      round(perc_car), 
+      "% workers driving to work"
+    ),
+    highlightOptions = highlightOptions(
+      weight = 2,
+      opacity = 1
+    )
+  ) %>% 
+  addLegend(
+    data = bay_pums_means,
+    pal = pums_pal,
+    values = ~perc_car,
+    title = "% workers driving<br>to commute",
+    position = "bottomleft"
+  )
+```
+
+#### Relationships of prevalent factors and preference for public transportation
+In this section we try to build models to show the relationship between people's preference to public transportation and other relevant variables.
+Before we attempt to build descriptive models to model worker's choice of transportation and other variables, we look into the correlation between variables. As shown in Figure 8, the prevalent variables such as income, rent, and travel time to work do not show strong correlation with the choice of transportation.
+```{r}
+bay_tp_classification <- readRDS("bay_tp_classification.rds")
+correlationplot <- bay_tp_classification %>% 
+  select(
+    means, 
+    income,
+    rent,
+    time
+  ) %>%
+  mutate(means = as.numeric(means)) %>% 
+  cor()
+corrplot(
+  correlationplot, 
+  method = "number",
+  type = "upper"
+)
+```
+
+Since we focus on encouraging people to take more public transportation, we try to build regression model with the percentage of population taking public transportation and population with income over 100k, working outside of county of residence, and non-white population.
+```{r}
+bay_multiple_tract <- 
+  getCensus(
+    name = "acs/acs5",
+    vintage = 2019,
+    region = "tract:*",
+    regionin = "state:06+county:001,013,041,055,075,081,085,095,097",
+    vars = c(
+      "B08130_001E",
+      "B08130_003E",
+      "B08130_016E",
+      "B19001_001E",
+      "B19001_014E",
+      "B19001_015E",
+      "B19001_016E",
+      "B19001_017E",
+      "B19001A_001E"
+    )) %>% 
+  transmute(
+    tract = paste0(state, county, tract),
+    perc_transport = B08130_016E/B08130_001E,
+    perc_outcounty = 1 - B08130_003E / B08130_001E,
+    perc_over100k = (B19001_014E + B19001_015E + B19001_016E + B19001_017E) / B19001_001E,
+    perc_non_white = 1 - B19001A_001E / B19001_001E
+  ) %>% 
+  filter(
+    !is.na(perc_transport), 
+    !is.na(perc_outcounty), 
+    !is.na(perc_over100k),
+    !is.na(perc_non_white)
+  )
+  
+```
+
+The correlation between variables described above is shown in Figure 9. As we can see, the rate of working outside of county of residence and non-white population is positively associated with public transportation preference, whereas high income is negatively associated with public transportation rate. However all correlation seems weak to be explanatory.
+
+```{r}
+correlationplot <- bay_multiple_tract %>% 
+  select(-tract) %>%
+  cor()
+
+corrplot(
+  correlationplot, 
+  method = "number",
+  type = "upper"
+)
+```
+The distribution of relevant variables and percentage of public transportation commuters is outlined in Figure 10-12. Percentages of outside-county work locations and non-white population show non-linear relationship with percentage of public transportation commuter, therefore we build polynomial regression models for these two variables.
+```{r income-ggplot, fig.cap = "Fig. 10 The scatterplot of public transportation rate vs income over 100k rate in tract level in the Bay Area"}
+ggplot(
+  data = bay_multiple_tract,
+  aes(
+      x = perc_transport,
+      y = perc_over100k
+    )
+) +
+  geom_point() +
+  geom_smooth()
+```
+
+```{r outcounty-ggplot, fig.cap = "Fig. 11 The scatterplot of public transportation rate vs working-outside-of-county rate in tract level in the Bay Area"}
+ggplot(
+  data = bay_multiple_tract,
+  aes(
+      x = perc_transport,
+      y = perc_outcounty
+    )
+) +
+  geom_point() +
+  geom_smooth()
+```
+
+```{r non-white-ggplot, fig.cap = "Fig. 12 The scatterplot of public transportation rate vs non-white population rate in tract level in the Bay Area"}
+ggplot(
+  data = bay_multiple_tract,
+  aes(
+      x = perc_transport,
+      y = perc_non_white
+    )
+) +
+  geom_point() +
+  geom_smooth()
+```
+
+#### Bart and Caltrain accessibility
+```{r bay-tracts-sf}
+bay_tracts <- tracts("CA", bay_county_names, cb = T, progress_bar = F)
+```
+
+```{r bart-data-loading, results='hide'}
+#unzip(zipfile = "BART_System_2020.kmz")
+#datasource: https://www.bart.gov/schedules/developers/geo
+#datefile source: https://www.bart.gov/sites/default/files/docs/BART_System_2020.kmz_.zip 
+bart_data <- st_read("doc.kml")
+# Use `st_layers' to list all layer names and their type in a data source.
+# Set the `layer' argument in `st_read' to read a particular layer.
+# Reading layer `BART Station' from data source 
+#st_layers("doc.kml")
+```
+
+```{r rail-data-loading, results='hide'}
+#datasource: https://gis.data.ca.gov/datasets/63697b01616b4df68e2b316e73d7a4d6/explore
+rail_data <- st_read("California_Rail_Stations.kml")
+```
+
+```{r sanity-check, eval = F}
+#plot bart stations and rail stations in Bay Area map
+bay_tracts 
+# contains bay tract information that we can subset bart stations and rail stations
+bay_county<- counties("CA", bay_county_names, cb = T, progress_bar = F)
+st_crs(bay_tracts) #NAD83
+st_crs(bart_data) #WGS84
+st_crs(rail_data) #WGS84
+```
+
+```{r projection}
+projection <- "+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=ft +no_defs"
+
+bart <- bart_data %>%
+  st_transform(projection)
+rail <- rail_data %>%
+  st_transform(projection)
+```
+We want to know how much the availability of public transport stations affects commuters' preference to public transportation. Since the majority of people taking public transportation resides outside of their county of residence, we take the cross-county public transportation systems as analysis objects, i.e. BART and Caltrain.
+Below is a map showing the Caltrain station locations in the Bay Area.
+```{r rail-station-map, fig.cap="The caltrain rail stations in the Bay Area"}
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = bay_counties
+  ) %>%
+  addMarkers(
+    data = rail_data[bay_counties %>% st_transform(st_crs(rail_data)),] %>%
+      st_centroid()
+  )
+```
+Similarly, the BART station distribution in the Bay Area is shown below.
+```{r bart-station-map, fig.cap="The BART stations in the Bay Area"}
+leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(
+    data = bay_counties
+  ) %>%
+  addMarkers(
+    data = bart_data[bay_counties %>% st_transform(st_crs(rail_data)),] %>%
+      st_centroid()
+  )
+```
+
+```{r}
+count_bart <- lengths(st_intersects(bay_tracts, 
+                      bart_data %>% 
+                        st_transform(st_crs(bay_tracts)) %>% 
+                        st_centroid())) #number of bart stations for each tract
+
+count_rail <- lengths(st_intersects(bay_tracts, 
+                      rail_data %>% 
+                        st_transform(st_crs(bay_tracts)) %>% 
+                        st_centroid())) 
+```
+
+```{r}
+bay_station <- bay_tracts %>%
+  st_drop_geometry() %>%
+  mutate(
+    tract = paste0(STATEFP, COUNTYFP, TRACTCE)
+  ) %>%
+  select(tract) %>%
+  bind_cols(bart = count_bart, rail = count_rail) %>%
+  inner_join(., bay_multiple_tract, by = "tract")
+```
+We build a regression model using the number of BART and rail stations in each tract, and variables described in above section to explore the impact these variables have on people's preference to use public transportation.
+The coefficient table of the model is shown Table 1. Apparently the availability of BART has a larger impact on people's preference than rail stations. Also, the percentage of people working outside of their county of residence shows as a predominant factor of commute choices.
+```{r model, }
+model <- lm(perc_transport ~ bart + rail + perc_outcounty +perc_outcounty^2+ perc_over100k + perc_non_white + perc_non_white^2, data = bay_station)
+pander::pander(summary(model), caption = "Table 1. The coefficient table of the public transportation preference regression model in the Bay Area")
+```
+
+### Conclusion and overlook
+Commute is a significant problem in the life of the Bay Area population. Over three quarters of the population choose to drive alone to work, both an economically and environmentally costly decision. The number of population using public transportation falls below 1/4, despite the area's constant efforts into building public transportation. San Francisco, Oakland, and Berkeley enjoy a higher usage of public transportation compared to other areas, thanks to its intensive BART system. Although the predilection for different means of transportation varies in different demographic and socioeconomic profiles, no significant correlation is found under current analysis. We believe the availability and convenience of the public transportation system is the predominant factor influencing people's choices. With the new $9.5 million infrastructure bill specifically targeting the public transportation in the Bay Area and the ambitious plan of BART to extend its services down to Downtown San Jose by 2025, we hope to see a change in the preferences of the Bay Area commuters in the near future.

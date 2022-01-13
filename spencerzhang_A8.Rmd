@@ -96,7 +96,7 @@ The map below shows the number of population in 2017 in each census tract in the
 pums_pal <- colorNumeric(
   palette = "YlOrRd",
   domain = pums_bart %>% 
-    filter(year == 2017) %>% 
+    filter(year == 2018) %>% 
     pull(pop)
 )
 
@@ -104,7 +104,7 @@ leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron) %>% 
   addPolygons(
     data = pums_bart %>% 
-      filter(year == 2017) %>% 
+      filter(year == 2018) %>% 
       right_join(bay_pumas %>% select(PUMA = PUMACE10)) %>% 
       st_as_sf(),
     fillColor = ~pums_pal(pop),
